@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#a6192e">
+  <title>HemaCare | Anemia Classification</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --red-950: #701021;
+      --red-900: #86172a;
+      --red-800: #a6192e;
+      --red-700: #c52d43;
+      --red-100: #fbecef;
+      --red-50: #fff7f8;
+      --ink: #292329;
+      --muted: #81757a;
+      --line: #eadfe2;
+      --surface: #ffffff;
+      --shadow: 0 8px 26px rgba(89, 27, 40, 0.055);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background: #fffafb;
+      font-family: "Leelawadee UI", Tahoma, "Noto Sans Thai", sans-serif;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .topbar {
+      height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(20px, 6vw, 88px);
+      border-bottom: 1px solid rgba(234, 223, 226, 0.78);
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--red-950);
+      font-size: 16px;
+      font-weight: 750;
+      letter-spacing: 0.01em;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      color: #fff;
+      background: var(--red-800);
+      box-shadow: 0 3px 9px rgba(166, 25, 46, 0.12);
+    }
+
+    .brand-mark svg {
+      width: 21px;
+      height: 21px;
+    }
+
+    .secure-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #766b70;
+      font-size: 12px;
+    }
+
+    .secure-label svg {
+      width: 16px;
+      height: 16px;
+      color: var(--red-700);
+    }
+
+    main {
+      width: min(980px, calc(100% - 40px));
+      margin: 32px auto 56px;
+    }
+
+    .intro {
+      margin: 0 0 22px;
+      padding-left: 15px;
+      border-left: 3px solid #dba0a9;
+      text-align: left;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 4px;
+      color: #8c737a;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--red-950);
+      font-size: clamp(23px, 3vw, 29px);
+      font-weight: 750;
+      letter-spacing: -0.02em;
+    }
+
+    .intro p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .form-card {
+      overflow: hidden;
+      border: 1px solid rgba(234, 223, 226, 0.9);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .form-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 17px 24px;
+      border-bottom: 1px solid #f0e8ea;
+      background: #fff;
+    }
+
+    .heading-icon {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border: 1px solid #f3d9de;
+      border-radius: 11px;
+      color: var(--red-800);
+      background: #fff;
+    }
+
+    .heading-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .form-heading h2 {
+      margin: 0;
+      color: var(--red-950);
+      font-size: 15px;
+      font-weight: 750;
+    }
+
+    .form-heading p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    form {
+      padding: 24px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px 22px;
+    }
+
+    .field {
+      min-width: 0;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .clinical-panels {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+      gap: 18px;
+      margin-top: 12px;
+    }
+
+    .clinical-section-heading {
+      margin: 28px 0 0;
+      color: var(--red-950);
+      font-size: 17px;
+      font-weight: 750;
+    }
+
+    .cbc-section {
+      margin-top: 12px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .cbc-section p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .cbc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px 16px;
+    }
+
+    .cbc-field label {
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    .cbc-field input {
+      height: 42px;
+    }
+
+    .clinical-panel {
+      min-width: 0;
+      margin: 0;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .clinical-panel-heading {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .panel-number {
+      width: 27px;
+      height: 27px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: var(--red-800);
+      background: var(--red-50);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .clinical-panel h3 {
+      margin: 0;
+      color: var(--red-950);
+      font-size: 15px;
+      font-weight: 750;
+    }
+
+    .clinical-panel-heading p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .checklist {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .check-option {
+      min-width: 0;
+      min-height: 39px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin: 0;
+      padding: 9px 10px;
+      border: 1px solid #f0e8ea;
+      border-radius: 8px;
+      color: #51474b;
+      background: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.5;
+      transition: border-color 150ms ease, background 150ms ease;
+    }
+
+    .check-option:hover {
+      border-color: #e4bbc2;
+      background: #fffafb;
+    }
+
+    .check-option input {
+      width: 15px;
+      height: 15px;
+      flex: 0 0 auto;
+      margin: 1px 0 0;
+      accent-color: var(--red-800);
+    }
+
+    .check-option input:focus-visible {
+      outline: 3px solid rgba(197, 45, 67, 0.28);
+      outline-offset: 2px;
+    }
+
+    .history-subsection {
+      margin-top: 19px;
+      padding-top: 16px;
+      border-top: 1px solid #f0e8ea;
+    }
+
+    .history-subsection h4 {
+      margin: 0 0 10px;
+      color: #55464c;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    label,
+    .group-label {
+      display: block;
+      margin-bottom: 7px;
+      color: #40373b;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .required {
+      margin-left: 3px;
+      color: var(--red-700);
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap input,
+    .input-wrap select {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      color: var(--ink);
+      background: #fff;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .input-wrap input::placeholder {
+      color: #b2a8ac;
+    }
+
+    .input-wrap input:focus,
+    .input-wrap select:focus {
+      border-color: var(--red-700);
+      box-shadow: 0 0 0 3px rgba(197, 45, 67, 0.1);
+    }
+
+    .input-wrap input:focus-visible,
+    .input-wrap select:focus-visible,
+    button:focus-visible {
+      outline: 3px solid rgba(197, 45, 67, 0.28);
+      outline-offset: 2px;
+    }
+
+    .input-wrap.with-unit input {
+      padding-right: 58px;
+    }
+
+    .unit {
+      position: absolute;
+      top: 50%;
+      right: 14px;
+      color: #998b90;
+      font-size: 12px;
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+
+    .sex-options {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .sex-option {
+      position: relative;
+      margin: 0;
+    }
+
+    .sex-option input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    .sex-option span {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: #5e5358;
+      background: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 150ms ease;
+    }
+
+    .sex-option input:checked + span {
+      border-color: var(--red-700);
+      color: var(--red-900);
+      background: var(--red-50);
+      box-shadow: inset 0 0 0 1px var(--red-700);
+    }
+
+    .sex-option input:focus-visible + span {
+      outline: 3px solid rgba(197, 45, 67, 0.28);
+      outline-offset: 2px;
+    }
+
+    .form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-top: 30px;
+      padding-top: 22px;
+      border-top: 1px solid #f0e8ea;
+    }
+
+    .privacy-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      max-width: 440px;
+      color: #83777c;
+      font-size: 11px;
+      line-height: 1.65;
+    }
+
+    .privacy-note svg {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+      margin-top: 1px;
+      color: var(--red-700);
+    }
+
+    .submit-button {
+      min-width: 160px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 20px;
+      border: 0;
+      border-radius: 10px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--red-800), var(--red-700));
+      box-shadow: 0 8px 18px rgba(166, 25, 46, 0.2);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      transition: transform 150ms ease, box-shadow 150ms ease;
+    }
+
+    .submit-button:hover {
+      box-shadow: 0 11px 22px rgba(166, 25, 46, 0.26);
+      transform: translateY(-1px);
+    }
+
+    .submit-button svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .confirmation {
+      display: none;
+      margin-top: 22px;
+    }
+
+    .confirmation.visible {
+      display: block;
+    }
+
+    .confirmation:not(.report-shell) {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: #51474b;
+      background: #fff;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .confirmation.notice:not(.report-shell) {
+      border-color: #f0d7a7;
+      color: #755319;
+      background: #fffaf0;
+    }
+
+    .report-shell {
+      overflow: hidden;
+      border: 1px solid #eadfe2;
+      border-radius: 16px;
+      color: var(--ink);
+      background: #fff;
+      box-shadow: 0 10px 28px rgba(89, 27, 40, 0.07);
+    }
+
+    .report-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 24px;
+      border-bottom: 1px solid #f0e8ea;
+      background: linear-gradient(110deg, #fff8f9, #fff);
+    }
+
+    .report-kicker {
+      margin: 0 0 4px;
+      color: var(--red-700);
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .report-banner h3 {
+      margin: 0;
+      color: var(--red-950);
+      font-size: 19px;
+      font-weight: 750;
+    }
+
+    .report-status {
+      flex: 0 0 auto;
+      padding: 7px 11px;
+      border: 1px solid #eadfe2;
+      border-radius: 999px;
+      color: #68585e;
+      background: #fff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .report-status.is-ida {
+      border-color: #edc7cd;
+      color: #8a1e30;
+      background: #fff0f2;
+    }
+
+    .report-content {
+      display: grid;
+      gap: 14px;
+      padding: 20px;
+    }
+
+    .report-section {
+      min-width: 0;
+      padding: 17px;
+      border: 1px solid #eee6e8;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .report-section h4 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 13px;
+      color: var(--red-950);
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .report-section h4::before {
+      width: 3px;
+      height: 16px;
+      border-radius: 3px;
+      content: "";
+      background: var(--red-700);
+    }
+
+    .report-facts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .report-fact {
+      min-width: 0;
+      padding: 10px 11px;
+      border-radius: 8px;
+      background: #faf7f8;
+    }
+
+    .report-fact dt {
+      margin-bottom: 3px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .report-fact dd {
+      overflow-wrap: anywhere;
+      margin: 0;
+      color: #383035;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .report-history-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .report-history-group h5 {
+      margin: 0 0 7px;
+      color: #74676c;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .report-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .report-chip {
+      padding: 5px 8px;
+      border: 1px solid #f0e5e8;
+      border-radius: 7px;
+      color: #584c51;
+      background: #fffafb;
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .report-empty {
+      color: #978b90;
+      font-size: 11px;
+    }
+
+    .cbc-table-wrap {
+      overflow-x: auto;
+    }
+
+    .cbc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .cbc-table th {
+      padding: 9px 10px;
+      color: #766a6f;
+      background: #faf7f8;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .cbc-table th:first-child {
+      border-radius: 7px 0 0 7px;
+    }
+
+    .cbc-table th:last-child {
+      border-radius: 0 7px 7px 0;
+    }
+
+    .cbc-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid #f1ebed;
+      color: #453b40;
+    }
+
+    .cbc-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .cbc-value {
+      font-variant-numeric: tabular-nums;
+      font-weight: 650;
+    }
+
+    .cbc-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .cbc-status::before {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      content: "";
+      background: currentColor;
+    }
+
+    .cbc-status.is-low {
+      color: #a33242;
+      background: #fff0f2;
+    }
+
+    .cbc-status.is-high {
+      color: #996000;
+      background: #fff6e5;
+    }
+
+    .cbc-status.is-normal {
+      color: #28714b;
+      background: #edf8f1;
+    }
+
+    .cbc-status.is-unknown {
+      color: #766a6f;
+      background: #f3f0f1;
+    }
+
+    .report-summary {
+      padding: 18px;
+      border: 1px solid #eadfe2;
+      border-left: 4px solid #aeb8bf;
+      border-radius: 12px;
+      background: #fbfcfd;
+    }
+
+    .report-summary.is-ida {
+      border-color: #edc7cd;
+      border-left-color: var(--red-700);
+      background: #fff7f8;
+    }
+
+    .report-summary h4 {
+      margin: 0 0 9px;
+      color: var(--red-950);
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .report-summary p {
+      margin: 0;
+      color: #52474c;
+      font-size: 12px;
+      line-height: 1.75;
+    }
+
+    .report-summary p + p {
+      margin-top: 9px;
+    }
+
+    .report-note {
+      padding: 12px 14px;
+      border-radius: 9px;
+      color: #72666b;
+      background: #f8f6f7;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    footer {
+      margin-top: 22px;
+      color: #a19599;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        height: 60px;
+        padding: 0 18px;
+      }
+
+      .secure-label {
+        font-size: 0;
+      }
+
+      .secure-label svg {
+        width: 19px;
+        height: 19px;
+      }
+
+      main {
+        width: min(100% - 28px, 520px);
+        margin: 28px auto 40px;
+      }
+
+      .intro {
+        margin-bottom: 19px;
+      }
+
+      .form-heading {
+        padding: 16px 18px;
+      }
+
+      form {
+        padding: 20px 18px;
+      }
+
+      .fields {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .sex-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .clinical-panels {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-top: 22px;
+      }
+
+      .clinical-panel {
+        padding: 15px;
+      }
+
+      .cbc-section {
+        padding: 15px;
+      }
+
+      .cbc-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px 12px;
+      }
+
+      .report-content {
+        padding: 13px;
+      }
+
+      .report-banner {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 17px;
+      }
+
+      .report-section {
+        padding: 13px;
+      }
+
+      .report-facts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .report-history-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .cbc-table th,
+      .cbc-table td {
+        padding: 8px 7px;
+      }
+
+      .field.full {
+        grid-column: auto;
+      }
+
+      .form-footer {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .submit-button {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 21s-8-4.8-8-11.2A4.8 4.8 0 0 1 12 6.7a4.8 4.8 0 0 1 8 3.1C20 16.2 12 21 12 21Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M8.2 12h2.3l1.2-2.2 1.8 4.4 1.2-2.2h1.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span>HemaCare</span>
+    </div>
+    <div class="secure-label">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 3 19 6v5.3c0 4.5-2.9 7.8-7 9.7-4.1-1.9-7-5.2-7-9.7V6l7-3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+        <path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      ข้อมูลสำหรับบันทึกในเครื่องนี้
+    </div>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div class="eyebrow">HEMACARE · BLOOD HEALTH</div>
+      <h1 id="page-title">Anemia Classification</h1>
+      <p>แบบฟอร์มบันทึกข้อมูลสำหรับการจัดประเภทภาวะโลหิตจาง</p>
+    </section>
+
+    <section class="form-card" aria-labelledby="form-title">
+      <div class="form-heading">
+        <span class="heading-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <div>
+          <h2 id="form-title">ข้อมูลผู้ป่วย</h2>
+          <p>ข้อมูลที่มีเครื่องหมาย <span class="required">*</span> จำเป็นต้องกรอก</p>
+        </div>
+      </div>
+
+      <form id="patient-form">
+        <div class="fields">
+          <div class="field full">
+            <label for="full-name">ชื่อ-นามสกุล <span class="required">*</span></label>
+            <div class="input-wrap">
+              <input id="full-name" name="fullName" type="text" autocomplete="name" placeholder="เช่น สมชาย ใจดี" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="hn">HN รหัสผู้ป่วย <span class="required">*</span></label>
+            <div class="input-wrap">
+              <input id="hn" name="hn" type="text" autocomplete="off" placeholder="เช่น HN-000123" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="age">อายุ <span class="required">*</span></label>
+            <div class="input-wrap with-unit">
+              <input id="age" name="age" type="number" min="0" max="130" inputmode="numeric" placeholder="เช่น 35" required>
+              <span class="unit">ปี</span>
+            </div>
+          </div>
+
+          <fieldset class="field full" style="border: 0; padding: 0; margin: 0;">
+            <legend class="group-label">เพศ <span class="required">*</span></legend>
+            <div class="sex-options">
+              <label class="sex-option">
+                <input type="radio" name="sex" value="ชาย" required>
+                <span>ชาย</span>
+              </label>
+              <label class="sex-option">
+                <input type="radio" name="sex" value="หญิง">
+                <span>หญิง</span>
+              </label>
+              <label class="sex-option">
+                <input type="radio" name="sex" value="หญิงตั้งครรภ์">
+                <span>หญิงตั้งครรภ์</span>
+              </label>
+              <label class="sex-option">
+                <input type="radio" name="sex" value="อื่น ๆ">
+                <span>อื่น ๆ</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="pregnancy-trimester">ไตรมาสการตั้งครรภ์ (ถ้ามี)</label>
+            <div class="input-wrap">
+              <input id="pregnancy-trimester" name="pregnancyTrimester" type="number" min="1" max="3" step="1" inputmode="numeric" placeholder="ตัวอย่าง: 1, 2 หรือ 3">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="weight">น้ำหนัก <span class="required">*</span></label>
+            <div class="input-wrap with-unit">
+              <input id="weight" name="weight" type="number" min="0" max="500" step="0.1" inputmode="decimal" placeholder="เช่น 60" required>
+              <span class="unit">กก.</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="height">ส่วนสูง <span class="required">*</span></label>
+            <div class="input-wrap with-unit">
+              <input id="height" name="height" type="number" min="0" max="300" step="0.1" inputmode="decimal" placeholder="เช่น 165" required>
+              <span class="unit">ซม.</span>
+            </div>
+          </div>
+        </div>
+
+        <h2 class="clinical-section-heading">อาการและประวัติผู้ป่วย</h2>
+        <div class="clinical-panels">
+          <fieldset class="clinical-panel">
+            <legend class="visually-hidden">อาการทางคลินิก</legend>
+            <div class="clinical-panel-heading" aria-hidden="true">
+              <span class="panel-number">01</span>
+              <div>
+                <h3>อาการทางคลินิก</h3>
+                <p>เลือกอาการทางคลินิกที่ผู้ป่วยมี</p>
+              </div>
+            </div>
+            <div class="checklist">
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="จุดเลือดออกใต้ผิวหนัง (Petechiae)"><span>จุดเลือดออกใต้ผิวหนัง (Petechiae)</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ภาวะเลือดออกใต้ผิวหนัง (Purpura)"><span>ภาวะเลือดออกใต้ผิวหนัง (Purpura)</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="รอยฟกช้ำ"><span>รอยฟกช้ำ</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="เหงือกอักเสบและมีเลือดออก"><span>เหงือกอักเสบและมีเลือดออก</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="เลือดกำเดาไหลบ่อยหรือหยุดยาก"><span>เลือดกำเดาไหลบ่อยหรือหยุดยาก</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="เลือดออกในตาขาว"><span>เลือดออกในตาขาว</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="มีเลือดปนในอุจจาระ"><span>มีเลือดปนในอุจจาระ</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="มีเลือดในปัสสาวะ"><span>มีเลือดในปัสสาวะ</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="อาเจียนเป็นเลือด"><span>อาเจียนเป็นเลือด</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ประจำเดือนมามากผิดปกติ"><span>ประจำเดือนมามากผิดปกติ</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="เลือดไหลไม่หยุด"><span>เลือดไหลไม่หยุด</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="หายใจถี่อย่างรุนแรง"><span>หายใจถี่อย่างรุนแรง</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="หายใจเร็ว"><span>หายใจเร็ว</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="วิงเวียนศีรษะ"><span>วิงเวียนศีรษะ</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="มึนงง"><span>มึนงง</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="สับสนหรือสภาพจิตใจเปลี่ยนแปลง"><span>สับสนหรือสภาพจิตใจเปลี่ยนแปลง</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="อ่อนเพลีย"><span>อ่อนเพลีย</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="หัวใจเต้นเร็ว"><span>หัวใจเต้นเร็ว</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="รู้สึกเหนื่อยง่าย"><span>รู้สึกเหนื่อยง่าย</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ออกกำลังกายได้น้อยลง"><span>ออกกำลังกายได้น้อยลง</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ผมร่วงหรือเล็บเปราะ"><span>ผมร่วงหรือเล็บเปราะ</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ปากแห้งหรือเจ็บที่มุมปาก"><span>ปากแห้งหรือเจ็บที่มุมปาก</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ปวดศีรษะ"><span>ปวดหัว</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="มือเท้าเย็น"><span>มือเท้าเย็น</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ผิวซีด"><span>ผิวซีด</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="เป็นลมหมดสติ"><span>เป็นลมหมดสติ</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="หัวใจเต้นผิดจังหวะ"><span>หัวใจเต้นผิดจังหวะ</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="เสียงอื้อในหู"><span>เสียงอื้อในหู</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ภาวะซีด/ตัวเหลือง"><span>ภาวะซีด / ตัวเหลือง</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ซีดบริเวณริมฝีปากหรือเยื่อบุตา"><span>ซีดบริเวณริมฝีปากหรือเยื่อบุตา</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ไข้เรื้อรังหรือเป็น ๆ หาย ๆ หรือไข้สูงฉับพลัน"><span>ไข้เรื้อรังหรือเป็น ๆ หาย ๆ หรือไข้สูงฉับพลัน</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ติดเชื้อบ่อย"><span>ติดเชื้อบ่อย</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="น้ำหนักลดหรือเบื่ออาหาร"><span>น้ำหนักลดหรือเบื่ออาหาร</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="แผลในปากเรื้อรัง"><span>แผลในปากเรื้อรัง</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ตับหรือม้ามโต แน่นท้อง หรืออิ่มเร็ว"><span>ตับหรือม้ามโต แน่นท้อง หรืออิ่มเร็ว</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ต่อมน้ำเหลืองโตบริเวณคอ รักแร้ หรือขาหนีบ"><span>ต่อมน้ำเหลืองโตบริเวณคอ รักแร้ หรือขาหนีบ</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="ปวดกระดูกหรือข้อ"><span>ปวดกระดูกหรือข้อ</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="เหงื่อออกตอนกลางคืน"><span>เหงื่อออกตอนกลางคืน</span></label>
+              <label class="check-option"><input type="checkbox" name="symptoms[]" value="เจ็บหน้าอก"><span>เจ็บหน้าอก</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="clinical-panel">
+            <legend class="visually-hidden">ประวัติผู้ป่วย</legend>
+            <div class="clinical-panel-heading" aria-hidden="true">
+              <span class="panel-number">02</span>
+              <div>
+                <h3>ประวัติผู้ป่วย</h3>
+                <p>เลือกประวัติที่เกี่ยวข้อง</p>
+              </div>
+            </div>
+            <div class="checklist">
+              <label class="check-option"><input type="checkbox" name="history[]" value="ประจำเดือนมามากกว่าปกติ"><span>ประจำเดือนมามากกว่าปกติ</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="เลือดออกจากเนื้องอกมดลูกหรือเยื่อบุโพรงมดลูกเจริญผิดที่"><span>เลือดออกจากเนื้องอกมดลูก หรือเยื่อบุโพรงมดลูกเจริญผิดที่</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="อุจจาระเหมือนยางมะตอย (GIB)"><span>อุจจาระเหมือนยางมะตอย (GIB)</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="เคยเกิดอุบัติเหตุ"><span>เคยเกิดอุบัติเหตุ</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="เคยบริจาคเลือด"><span>เคยบริจาคเลือด</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="น้ำหนักลดฮวบ"><span>น้ำหนักลดฮวบ</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ประวัติซีดและเหนื่อยง่ายจากภาวะโลหิตจาง"><span>มีอาการซีดและเหนื่อยง่ายจากภาวะโลหิตจาง</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="มีไข้สูงต่อเนื่องจากภูมิคุ้มกันบกพร่อง"><span>มีไข้สูงต่อเนื่อง (อาจสัมพันธ์กับภูมิคุ้มกันบกพร่อง)</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="มีประวัติเลือดออกง่าย เช่น เลือดกำเดาไหลหรือจุดเลือดออก"><span>มีประวัติเลือดออกง่าย เช่น เลือดกำเดาไหลหรือจุดเลือดออก</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="มีประวัติปวดกระดูกหรือข้อ"><span>มีประวัติปวดกระดูกหรือข้อ</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="น้ำหนักลดหรือเบื่ออาหาร"><span>น้ำหนักลดหรือเบื่ออาหาร</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="มีประวัติต่อมน้ำเหลืองโตหรือม้ามโต"><span>มีประวัติต่อมน้ำเหลืองโตหรือม้ามโต</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="อุจจาระเป็นเลือด"><span>อุจจาระเป็นเลือด</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="เคยแท้งบุตร"><span>เคยแท้งบุตร</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="วัณโรค (TB)"><span>วัณโรค (TB)</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="อยากกินสิ่งที่ไม่ใช่อาหาร (Pica)"><span>อยากกินสิ่งที่ไม่ใช่อาหาร (Pica)</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ใช้ยาและสารเคมีที่กดไขกระดูก"><span>ใช้ยาและสารเคมีที่กดไขกระดูก</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ใช้ยากลุ่ม NSAIDs"><span>ใช้ยากลุ่ม NSAIDs</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ใช้ยา NSAIDs หรือ aspirin เป็นเวลานาน"><span>ใช้ยา NSAIDs หรือ aspirin เป็นเวลานาน</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="แผลในกระเพาะอาหารหรือลำไส้เล็ก ริดสีดวง หรือติ่งเนื้อลำไส้ใหญ่"><span>แผลในกระเพาะอาหาร / ลำไส้เล็ก ริดสีดวง หรือติ่งเนื้อลำไส้ใหญ่</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="มะเร็งกระเพาะอาหารหรือมะเร็งลำไส้ใหญ่"><span>มะเร็งกระเพาะอาหารหรือมะเร็งลำไส้ใหญ่</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="รับประทานอาหารที่มีธาตุเหล็กไม่เพียงพอ"><span>รับประทานอาหารที่มีธาตุเหล็กไม่เพียงพอ</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ติดเชื้อ Helicobacter pylori (H. pylori)"><span>ติดเชื้อ Helicobacter pylori (H. pylori)</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="โรคลำไส้อักเสบ (IBD)"><span>โรคลำไส้อักเสบ (IBD)</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ยาเคมีบำบัด"><span>ยาเคมีบำบัด</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="โรคไตเรื้อรัง"><span>โรคไตเรื้อรัง</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ติดเชื้อ HIV"><span>ติดเชื้อ HIV</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="โรคภูมิคุ้มกันต้านตนเอง"><span>โรคภูมิคุ้มกันต้านตนเอง</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="รับประทานมังสวิรัติอย่างเคร่งครัด"><span>รับประทานมังสวิรัติอย่างเคร่งครัด</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ดื่มแอลกอฮอล์มาก"><span>ดื่มแอลกอฮอล์มาก</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="เคยผ่าตัดกระเพาะอาหาร"><span>เคยผ่าตัดกระเพาะอาหาร</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="เคยผ่าตัดลำไส้เล็กส่วนปลาย"><span>เคยผ่าตัดลำไส้เล็กส่วนปลาย</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ใช้ยาที่ยับยั้งการดูดซึมหรือเผาผลาญ Vitamin B12"><span>ใช้ยาที่ยับยั้งการดูดซึมหรือเผาผลาญ Vitamin B12</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ใช้ยาเบาหวาน"><span>ใช้ยาเบาหวาน</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ใช้ยาลดกรด"><span>ใช้ยาลดกรด</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ใช้ยาต้านไวรัส HIV"><span>ใช้ยาต้านไวรัส HIV</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ภาวะไทรอยด์ทำงานน้อย"><span>ภาวะไทรอยด์ทำงานน้อย</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="สัมผัสสารเคมีเป็นพิษ"><span>สัมผัสสารเคมีเป็นพิษ</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="โรคโลหิตจางชนิดอะพลาสติก"><span>โรคโลหิตจางชนิดอะพลาสติก (Aplastic anemia)</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="เคยได้รับการวินิจฉัย CML"><span>เคยได้รับการวินิจฉัย Chronic Myelogenous Leukemia (CML)</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="เคยได้รับการวินิจฉัย Myeloproliferative Neoplasm (MPN) เช่น PV หรือ ET"><span>เคยได้รับการวินิจฉัย Myeloproliferative Neoplasm (MPN) เช่น Polycythemia Vera (PV) หรือ Essential Thrombocythemia (ET)</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="เคยได้รับการวินิจฉัย Myelodysplastic Syndrome (MDS)"><span>เคยได้รับการวินิจฉัย Myelodysplastic Syndrome (MDS)</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="สัมผัสเบนซีนหรือสารเคมีอุตสาหกรรม/สารกำจัดศัตรูพืช"><span>สัมผัสเบนซีน หรือสารเคมีอุตสาหกรรม / สารกำจัดศัตรูพืช</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="เคยได้รับการฉายรังสีรักษา"><span>เคยได้รับการฉายรังสีรักษา</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="สูบบุหรี่"><span>สูบบุหรี่</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ภาวะภูมิคุ้มกันบกพร่อง"><span>ภาวะภูมิคุ้มกันบกพร่อง</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="โรคมะเร็ง"><span>โรคมะเร็ง</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="การติดเชื้อ"><span>การติดเชื้อ</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="ม้ามโตกว่าปกติ"><span>ม้ามโตกว่าปกติ</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="กำลังตั้งครรภ์"><span>กำลังตั้งครรภ์</span></label>
+              <label class="check-option"><input type="checkbox" name="history[]" value="เคยผ่าตัด"><span>เคยผ่าตัด</span></label>
+            </div>
+
+            <section class="history-subsection" aria-labelledby="family-history-title">
+              <h4 id="family-history-title">ประวัติครอบครัว</h4>
+              <div class="checklist">
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="คนในครอบครัวเป็นโรคโลหิตจาง"><span>คนในครอบครัวเป็นโรคโลหิตจาง</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="คนในครอบครัวมีภาวะซีดเรื้อรัง"><span>คนในครอบครัวมีภาวะซีดเรื้อรัง</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวเป็นโรคธาลัสซีเมีย"><span>มีคนในครอบครัวเป็นโรคธาลัสซีเมีย (Thalassemia)</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="คนในครอบครัวเป็นโรคเลือดทางพันธุกรรม"><span>คนในครอบครัวเป็นโรคเลือดทางพันธุกรรม</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีประวัติ Hemolytic anemia"><span>มีประวัติเม็ดเลือดแดงแตกง่าย (Hemolytic anemia)</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีประวัติโรคเม็ดเลือดแดงทรงกลมแต่กำเนิด (Hereditary Spherocytosis)"><span>ครอบครัวมีประวัติโรคเม็ดเลือดแดงทรงกลมแต่กำเนิด (Hereditary Spherocytosis)</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวเป็นโรคขาดเอนไซม์ G6PD"><span>โรคขาดเอนไซม์ G6PD</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="คนในครอบครัวมีประวัติตัวเหลือง ซีด หรือต้องรับเลือดบ่อย"><span>คนในครอบครัวมีประวัติตัวเหลือง ซีด หรือต้องรับเลือดบ่อย</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีประวัติม้ามโตหรือตัดม้ามตั้งแต่อายุน้อย"><span>มีประวัติม้ามโต / ตัดม้ามตั้งแต่อายุน้อย</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="คนในครอบครัวเป็น Pernicious Anemia"><span>คนในครอบครัวเป็น Pernicious Anemia</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีภาวะดูดซึม Vitamin B12 หรือ Folate บกพร่องแต่กำเนิด"><span>ครอบครัวมีภาวะดูดซึม Vitamin B12 หรือ Folate บกพร่องแต่กำเนิด</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีประวัติ Bernard-Soulier Syndrome (BSS)"><span>ครอบครัวมีประวัติ Bernard-Soulier Syndrome (BSS)</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีประวัติโรคเลือดออกง่ายทางพันธุกรรมที่ทำให้เกล็ดเลือดผิดปกติหรือมีจำนวนลดลง"><span>ครอบครัวมีประวัติโรคเลือดออกง่ายทางพันธุกรรมที่ทำให้เกล็ดเลือดผิดปกติหรือมีจำนวนลดลง</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="คนในครอบครัวเป็นมะเร็งเม็ดเลือดขาว (Leukemia)"><span>คนในครอบครัวเป็นมะเร็งเม็ดเลือดขาว (Leukemia)</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีสมาชิกหลายคนเป็นมะเร็งเม็ดเลือดขาว"><span>ครอบครัวมีสมาชิกหลายคนเป็นมะเร็งเม็ดเลือดขาว</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="คนในครอบครัวเป็นมะเร็งต่อมน้ำเหลือง (Lymphoma)"><span>คนในครอบครัวเป็นมะเร็งต่อมน้ำเหลือง (Lymphoma)</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีประวัติโรคไขกระดูกล้มเหลวหรือผิดปกติ"><span>ครอบครัวมีประวัติโรคไขกระดูกล้มเหลวหรือผิดปกติ</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีสมาชิกเกล็ดเลือดต่ำเรื้อรังหรือมีความผิดปกติของไขกระดูก"><span>ครอบครัวมีสมาชิกเกล็ดเลือดต่ำเรื้อรังหรือมีความผิดปกติของไขกระดูก</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีประวัติกลุ่มอาการไขกระดูกผิดปกติที่ถ่ายทอดได้ เช่น RUNX1, CEBPA หรือ ANKRD26"><span>ครอบครัวมีประวัติกลุ่มอาการไขกระดูกผิดปกติที่ถ่ายทอดได้ (เช่น RUNX1, CEBPA หรือ ANKRD26)</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีผู้ป่วย Down Syndrome (Trisomy 21)"><span>ครอบครัวมีผู้ป่วย Down Syndrome (Trisomy 21)</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีผู้ป่วย Fanconi Anemia"><span>ครอบครัวมีผู้ป่วย Fanconi Anemia</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีผู้ป่วย Li-Fraumeni Syndrome (TP53)"><span>ครอบครัวมีผู้ป่วย Li-Fraumeni Syndrome (TP53)</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีผู้ป่วย Bloom Syndrome"><span>ครอบครัวมีผู้ป่วย Bloom Syndrome</span></label>
+                <label class="check-option"><input type="checkbox" name="familyHistory[]" value="ครอบครัวมีผู้ป่วย Ataxia-Telangiectasia"><span>ครอบครัวมีผู้ป่วย Ataxia-Telangiectasia</span></label>
+              </div>
+            </section>
+          </fieldset>
+        </div>
+
+        <h2 class="clinical-section-heading">ผลการตรวจ CBC Results</h2>
+        <section class="cbc-section" aria-label="กรอกผลการตรวจ CBC">
+          <p>กรอกเฉพาะค่าที่ต้องการใช้ประเมินภาวะนั้น ๆ ช่อง CBC ที่เว้นว่างจะไม่ถูกนำมาคำนวณ</p>
+          <p>ช่วงอ้างอิงของเม็ดเลือดขาวในแบบฟอร์มนี้ใช้ร่วมกันทุกเพศ ควรยึดช่วงอ้างอิงที่ระบุในใบผลตรวจของห้องปฏิบัติการเป็นหลัก</p>
+          <div class="cbc-grid">
+            <div class="cbc-field">
+              <label for="cbc-wbc">WBC (K/uL)</label>
+              <div class="input-wrap"><input id="cbc-wbc" name="cbcWbc" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-lymp">LYMp (%)</label>
+              <div class="input-wrap"><input id="cbc-lymp" name="cbcLymp" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-neutp">NEUTp (%)</label>
+              <div class="input-wrap"><input id="cbc-neutp" name="cbcNeutp" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-monop">MONOp (%)</label>
+              <div class="input-wrap"><input id="cbc-monop" name="cbcMonop" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-eosp">EOSp (%)</label>
+              <div class="input-wrap"><input id="cbc-eosp" name="cbcEosp" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-blast">Blast cells ในเลือด (%)</label>
+              <div class="input-wrap"><input id="cbc-blast" name="cbcBlast" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-marrow-blast">Blast cells ในไขกระดูก (%)</label>
+              <div class="input-wrap"><input id="cbc-marrow-blast" name="cbcMarrowBlast" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-lymn">LYMn (K/uL)</label>
+              <div class="input-wrap"><input id="cbc-lymn" name="cbcLymn" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-neutn">NEUTn (K/uL)</label>
+              <div class="input-wrap"><input id="cbc-neutn" name="cbcNeutn" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-rbc">RBC (M/uL)</label>
+              <div class="input-wrap"><input id="cbc-rbc" name="cbcRbc" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-hgb">HGB / Hb (g/dL)</label>
+              <div class="input-wrap"><input id="cbc-hgb" name="cbcHgb" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-hct">HCT (%)</label>
+              <div class="input-wrap"><input id="cbc-hct" name="cbcHct" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-mcv">MCV (fL)</label>
+              <div class="input-wrap"><input id="cbc-mcv" name="cbcMcv" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-mch">MCH (pg)</label>
+              <div class="input-wrap"><input id="cbc-mch" name="cbcMch" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-mchc">MCHC (g/dL)</label>
+              <div class="input-wrap"><input id="cbc-mchc" name="cbcMchc" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-rdw">RDW (%)</label>
+              <div class="input-wrap"><input id="cbc-rdw" name="cbcRdw" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-plt">PLT (K/uL)</label>
+              <div class="input-wrap"><input id="cbc-plt" name="cbcPlt" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-mpv">MPV (fL)</label>
+              <div class="input-wrap"><input id="cbc-mpv" name="cbcMpv" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-pdw">PDW (%)</label>
+              <div class="input-wrap"><input id="cbc-pdw" name="cbcPdw" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+            <div class="cbc-field">
+              <label for="cbc-pct">PCT (K/uL)</label>
+              <div class="input-wrap"><input id="cbc-pct" name="cbcPct" type="number" min="0" step="any" inputmode="decimal" placeholder="ระบุค่า"></div>
+            </div>
+          </div>
+        </section>
+
+        <div class="form-footer">
+          <div class="privacy-note">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="5" y="10" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+            <span>ผลวิเคราะห์เป็นข้อมูลเบื้องต้น ไม่ใช้แทนการวินิจฉัยทางการแพทย์</span>
+          </div>
+          <button class="submit-button" type="submit">
+            วิเคราะห์ผล CBC
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <div id="confirmation" class="confirmation" role="status" aria-live="polite">
+        </div>
+      </form>
+    </section>
+
+    <footer>HemaCare · Anemia Classification</footer>
+  </main>
+
+  <script>
+    const form = document.getElementById("patient-form");
+    const confirmation = document.getElementById("confirmation");
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const selectedSex = form.querySelector('input[name="sex"]:checked');
+      const sex = selectedSex?.value ?? "";
+      const trimesterValue = form.elements.namedItem("pregnancyTrimester").value;
+      const isPregnant = sex === "หญิงตั้งครรภ์";
+      const isFemale = sex === "หญิง" || isPregnant;
+      const isMale = sex === "ชาย";
+      const enteredCbcInputs = [...form.querySelectorAll(".cbc-section input")]
+        .filter((input) => input.value.trim() !== "");
+
+      confirmation.classList.remove("normal", "notice", "report-shell");
+      if (enteredCbcInputs.length === 0) {
+        confirmation.replaceChildren();
+        confirmation.textContent = "กรุณากรอกผล CBC อย่างน้อย 1 ค่า เพื่อใช้ในการประเมิน";
+        confirmation.classList.add("notice", "visible");
+        return;
+      }
+      const enteredHemoglobinOrHematocrit =
+        form.elements.namedItem("cbc-hgb").value.trim() !== "" ||
+        form.elements.namedItem("cbc-hct").value.trim() !== "";
+      if (isPregnant && enteredHemoglobinOrHematocrit && !["1", "2", "3"].includes(trimesterValue)) {
+        confirmation.replaceChildren();
+        confirmation.textContent = "กรุณากรอกไตรมาสการตั้งครรภ์เป็น 1, 2 หรือ 3 เพื่อประเมินค่า HGB / Hb";
+        confirmation.classList.add("notice", "visible");
+        return;
+      }
+
+      const readCbcValue = (id) => {
+        const value = form.elements.namedItem(id).value.trim();
+        return value === "" ? Number.NaN : Number(value);
+      };
+      const sexSpecificRbcRange = isMale
+        ? { min: 4.7, max: 6.1 }
+        : isPregnant
+          ? { min: 3.5, max: 4.8 }
+          : sex === "หญิง"
+            ? { min: 4.2, max: 5.4 }
+            : { min: 4.4, max: 6.0 };
+      const cbcRanges = [
+        { id: "cbc-wbc", name: "WBC", min: 4.0, max: 11.0, unit: "K/uL", category: "wbc" },
+        { id: "cbc-lymp", name: "LYMp", min: 26.0, max: 46.0, unit: "%", category: "wbc" },
+        { id: "cbc-neutp", name: "NEUTp", min: 49.0, max: 74.0, unit: "%", category: "wbc" },
+        { id: "cbc-monop", name: "MONOp", min: 2.0, max: 12.0, unit: "%", category: "wbc" },
+        { id: "cbc-eosp", name: "EOSp", min: 0.0, max: 5.0, unit: "%", category: "wbc" },
+        { id: "cbc-blast", name: "Blast cells", min: 0.0, max: 0.0, unit: "%", category: "wbc" },
+        { id: "cbc-lymn", name: "LYMn", min: 1.0, max: 5.1, unit: "K/uL", category: "wbc" },
+        { id: "cbc-neutn", name: "NEUTn", min: 2.0, max: 8.0, unit: "K/uL", category: "wbc" },
+        { id: "cbc-rbc", name: "RBC", ...sexSpecificRbcRange, unit: "M/uL", category: "rbc" },
+        { id: "cbc-mcv", name: "MCV", min: 80.0, max: 100.0, unit: "fL", category: "rbc" },
+        { id: "cbc-mch", name: "MCH", min: 27.0, max: 33.0, unit: "pg", category: "rbc" },
+        { id: "cbc-mchc", name: "MCHC", min: 31.0, max: 36.0, unit: "g/dL", category: "rbc" },
+        { id: "cbc-rdw", name: "RDW", min: 11.5, max: 14.5, unit: "%", category: "rbc" },
+        { id: "cbc-plt", name: "PLT", min: 150, max: 400, unit: "K/uL", category: "platelet" },
+        { id: "cbc-mpv", name: "MPV", min: 7.5, max: 11.0, unit: "fL", category: "platelet" },
+        { id: "cbc-pdw", name: "PDW", min: 9.0, max: 17.0, unit: "%", category: "platelet" },
+        { id: "cbc-pct", name: "PCT", min: 0.1, max: 0.25, unit: "K/uL", category: "platelet" }
+      ];
+
+      let hemoglobinRange = null;
+      let hematocritRange = null;
+      let trimesterName = "";
+      if (isMale) {
+        hemoglobinRange = { id: "cbc-hgb", name: "Hb", min: 13.0, max: 17.0, unit: "g/dL" };
+        hematocritRange = { id: "cbc-hct", name: "Hct", min: 42.0, max: 52.0, unit: "%" };
+      } else if (isFemale && !isPregnant) {
+        hemoglobinRange = { id: "cbc-hgb", name: "Hb", min: 12.0, unit: "g/dL" };
+        hematocritRange = { id: "cbc-hct", name: "Hct", min: 37.0, max: 47.0, unit: "%" };
+      } else if (isPregnant && ["1", "2", "3"].includes(trimesterValue)) {
+        const pregnancyRanges = {
+          "1": { minHb: 11.0, minHct: 33.0, label: "ไตรมาสที่ 1" },
+          "2": { minHb: 10.5, minHct: 32.0, label: "ไตรมาสที่ 2" },
+          "3": { minHb: 11.0, minHct: 33.0, label: "ไตรมาสที่ 3" }
+        };
+        const pregnancyRange = pregnancyRanges[trimesterValue];
+        hemoglobinRange = { id: "cbc-hgb", name: "Hb", min: pregnancyRange.minHb, unit: "g/dL" };
+        hematocritRange = { id: "cbc-hct", name: "Hct", min: pregnancyRange.minHct, unit: "%" };
+        trimesterName = pregnancyRange.label;
+      }
+
+      const statusForRange = (value, range) => {
+        if (!Number.isFinite(value)) return "ไม่ได้กรอก";
+        if (value < range.min) return "ต่ำ";
+        if (range.max !== undefined && value > range.max) return "สูง";
+        return "ปกติ";
+      };
+
+      const hemoglobin = readCbcValue("cbc-hgb");
+      const hematocrit = readCbcValue("cbc-hct");
+      const marrowBlastInput = form.elements.namedItem("cbc-marrow-blast");
+      const marrowBlastValue = marrowBlastInput.value.trim();
+      const marrowBlastCells = marrowBlastValue === "" ? null : Number(marrowBlastValue);
+      const marrowBlastRangeNormal =
+        marrowBlastCells === null || (marrowBlastCells >= 1 && marrowBlastCells <= 4);
+      const hemoglobinStatus = hemoglobinRange
+        ? statusForRange(hemoglobin, hemoglobinRange)
+        : "ไม่มีเกณฑ์แปลผล";
+      const hematocritStatus = hematocritRange
+        ? statusForRange(hematocrit, hematocritRange)
+        : "ไม่มีเกณฑ์แปลผล";
+      const enteredCbcRanges = cbcRanges.filter((range) =>
+        Number.isFinite(readCbcValue(range.id))
+      );
+      const allCbcRangesNormal = enteredCbcRanges.every((range) =>
+        statusForRange(readCbcValue(range.id), range) === "ปกติ"
+      );
+      const healthyCbcPattern =
+        hemoglobinRange !== null &&
+        hematocritRange !== null &&
+        Number.isFinite(hemoglobin) &&
+        Number.isFinite(hematocrit) &&
+        hemoglobinStatus === "ปกติ" &&
+        hematocritStatus === "ปกติ" &&
+        allCbcRangesNormal &&
+        marrowBlastRangeNormal;
+      const enteredHematologyValues = [
+        ...(Number.isFinite(hemoglobin) ? [hemoglobinStatus] : []),
+        ...(Number.isFinite(hematocrit) ? [hematocritStatus] : []),
+        ...enteredCbcRanges.map((range) => statusForRange(readCbcValue(range.id), range)),
+        ...(marrowBlastCells === null ? [] : [
+          statusForRange(marrowBlastCells, { min: 1.0, max: 4.0 })
+        ])
+      ];
+      const enteredValuesAllNormal =
+        enteredHematologyValues.length > 0 &&
+        enteredHematologyValues.every((status) => status === "ปกติ");
+      const anemia = hemoglobinRange !== null && hemoglobin < hemoglobinRange.min;
+      const lowHct = hematocritRange !== null && hematocrit < hematocritRange.min;
+      const redBloodCellCount = readCbcValue("cbc-rbc");
+      const blastCells = readCbcValue("cbc-blast");
+      const leukemiaHctMinimum = isMale
+        ? 40.0
+        : isPregnant
+          ? { "1": 33.0, "2": 32.0, "3": 33.0 }[trimesterValue]
+          : 36.0;
+      const leukemiaRedCellLineAbnormal =
+        anemia ||
+        (Number.isFinite(hematocrit) && hematocrit < leukemiaHctMinimum) ||
+        (Number.isFinite(redBloodCellCount) && redBloodCellCount < sexSpecificRbcRange.min);
+      const leukemiaWbcLineAbnormal =
+        Number.isFinite(readCbcValue("cbc-wbc")) &&
+        (readCbcValue("cbc-wbc") < 4.0 || readCbcValue("cbc-wbc") > 11.0);
+      const leukemiaLymphocytePercentage = readCbcValue("cbc-lymp");
+      const leukemiaNeutrophilPercentage = readCbcValue("cbc-neutp");
+      const leukemiaMonocytePercentage = readCbcValue("cbc-monop");
+      const leukemiaEosinophilPercentage = readCbcValue("cbc-eosp");
+      const leukemiaDifferentialAbnormal =
+        (Number.isFinite(leukemiaNeutrophilPercentage) &&
+          (leukemiaNeutrophilPercentage < 49.0 || leukemiaNeutrophilPercentage > 74.0)) ||
+        (Number.isFinite(leukemiaLymphocytePercentage) && leukemiaLymphocytePercentage < 26.0) ||
+        (Number.isFinite(leukemiaMonocytePercentage) &&
+          (leukemiaMonocytePercentage < 2.0 || leukemiaMonocytePercentage > 12.0)) ||
+        (Number.isFinite(leukemiaEosinophilPercentage) && leukemiaEosinophilPercentage < 0.0) ||
+        (Number.isFinite(leukemiaLymphocytePercentage) &&
+          Number.isFinite(leukemiaNeutrophilPercentage) &&
+          leukemiaLymphocytePercentage >= 74.0 &&
+          leukemiaNeutrophilPercentage < 20.0);
+      const normocyticRbcUpperLimit = isMale
+        ? 4.7
+        : isPregnant
+          ? 3.5
+          : sex === "หญิง"
+            ? 4.2
+            : null;
+      const macrocyticAnemia = isMale
+        ? hemoglobin < 13 || hematocrit < 41
+        : sex === "หญิง"
+          ? hemoglobin < 12 || hematocrit < 36
+          : isPregnant
+            ? hemoglobin < 11
+            : false;
+      const mcvValue = readCbcValue("cbc-mcv");
+      const plateletCount = readCbcValue("cbc-plt");
+      const meanPlateletVolume = readCbcValue("cbc-mpv");
+      const plateletDistributionWidth = readCbcValue("cbc-pdw");
+      const plateletcrit = readCbcValue("cbc-pct");
+      const thrombocytopeniaSeverity = plateletCount < 20
+        ? "ต่ำมาก / อันตราย"
+        : plateletCount < 50
+          ? "ต่ำรุนแรง"
+          : plateletCount < 100
+            ? "ต่ำปานกลาง"
+            : plateletCount < 150
+              ? "ต่ำเล็กน้อย"
+              : "";
+      const thrombocytopeniaPattern = plateletCount < 150;
+      const thrombocytosisPattern = plateletCount > 400;
+      const plateletLineAbnormal = thrombocytopeniaPattern;
+      const marrowBlastAbnormal =
+        marrowBlastCells !== null && !marrowBlastRangeNormal;
+      const leukemiaAbnormalLineCount = [
+        leukemiaWbcLineAbnormal || leukemiaDifferentialAbnormal,
+        leukemiaRedCellLineAbnormal,
+        plateletLineAbnormal
+      ].filter(Boolean).length;
+      let leukemiaScreeningPattern =
+        blastCells > 0 ||
+        marrowBlastAbnormal ||
+        leukemiaWbcLineAbnormal ||
+        leukemiaAbnormalLineCount >= 2;
+      const leukemiaWithThrombocytopeniaPattern =
+        thrombocytopeniaPattern && leukemiaScreeningPattern;
+      const leukemiaWithAnemiaPattern =
+        anemia && leukemiaScreeningPattern && !thrombocytopeniaPattern;
+      const macrocytosisSeverity = mcvValue > 110
+        ? "รุนแรง (>110 fL)"
+        : mcvValue > 100
+          ? "เล็กน้อย (100–110 fL)"
+          : "";
+      const macrocyticPattern = macrocyticAnemia && mcvValue > 100;
+      const normocyticHypochromicPattern =
+        anemia &&
+        mcvValue >= 80 &&
+        mcvValue <= 100 &&
+        readCbcValue("cbc-mch") < 27 &&
+        readCbcValue("cbc-mchc") < 31 &&
+        normocyticRbcUpperLimit !== null &&
+        redBloodCellCount <= normocyticRbcUpperLimit;
+
+      const idaMarkers = {
+        lowHgb: anemia,
+        lowHct,
+        lowMcv: readCbcValue("cbc-mcv") < 80,
+        lowMch: readCbcValue("cbc-mch") < 27,
+        lowMchc: readCbcValue("cbc-mchc") < 31,
+        rbcLowOrNormal: readCbcValue("cbc-rbc") <= 6.0,
+        highPlatelets: readCbcValue("cbc-plt") > 400,
+        highPdw: plateletDistributionWidth > 17.0,
+        highPct: readCbcValue("cbc-pct") > 0.25
+      };
+      const idaPattern = hemoglobinRange !== null && Object.values(idaMarkers).every(Boolean);
+      if (
+        idaPattern &&
+        blastCells === 0 &&
+        !marrowBlastAbnormal &&
+        !leukemiaWbcLineAbnormal &&
+        !leukemiaDifferentialAbnormal
+      ) {
+        leukemiaScreeningPattern = false;
+      }
+
+      const checkedValues = (name) => [...form.querySelectorAll(`input[name="${name}"]:checked`)]
+        .map((input) => input.value);
+      const symptoms = checkedValues("symptoms[]");
+      const history = checkedValues("history[]");
+      const familyHistory = checkedValues("familyHistory[]");
+
+      const createElement = (tag, className, text) => {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        if (text !== undefined) {
+          element.textContent = typeof text === "string"
+            ? text.replace(/\bNaN\b/g, "ไม่ได้กรอก")
+            : text;
+        }
+        return element;
+      };
+
+      confirmation.replaceChildren();
+      confirmation.classList.remove("normal", "notice");
+      confirmation.classList.add("report-shell", "visible");
+
+      const reportStatusText = leukemiaScreeningPattern
+        ? leukemiaWithThrombocytopeniaPattern
+          ? "พบรูปแบบ CBC ผิดปกติร่วมกับเกล็ดเลือดต่ำ · ควรประเมินเร่งด่วน"
+          : leukemiaWithAnemiaPattern
+            ? "พบภาวะโลหิตจางร่วมกับความผิดปกติของ WBC/Blast · ควรประเมินเพิ่มเติม"
+          : blastCells > 0
+            ? "พบ Blast cells · ควรตรวจยืนยันเร่งด่วน"
+            : marrowBlastAbnormal
+              ? "พบ Blast cells ในไขกระดูกนอกช่วงอ้างอิง · ควรประเมินเพิ่มเติม"
+            : leukemiaWbcLineAbnormal && leukemiaAbnormalLineCount === 1
+              ? "พบ WBC นอกช่วงอ้างอิง · ควรประเมินเพิ่มเติม"
+            : "พบความผิดปกติ CBC หลายสายเซลล์ · ควรประเมินเพิ่มเติม"
+        : thrombocytopeniaPattern
+        ? `เกล็ดเลือดต่ำ · ${thrombocytopeniaSeverity}`
+        : macrocyticPattern
+          ? "เข้าได้กับรูปแบบ Macrocytic Anemia"
+        : normocyticHypochromicPattern
+          ? "เข้าได้กับรูปแบบ Normocytic Hypochromic Anemia"
+        : idaPattern
+          ? "เข้าได้กับรูปแบบคัดกรอง IDA"
+        : anemia
+          ? "พบภาวะโลหิตจาง"
+        : healthyCbcPattern
+          ? "ไม่พบภาวะโลหิตจาง"
+        : enteredValuesAllNormal
+          ? "ค่าที่กรอกอยู่ในช่วงอ้างอิง · ข้อมูลยังไม่ครบเพื่อประเมินทุกภาวะ"
+          : "พบค่า CBC นอกช่วงอ้างอิง";
+      const reportHeader = createElement("header", "report-banner");
+      const reportTitleGroup = createElement("div");
+      reportTitleGroup.append(
+        createElement("p", "report-kicker", "HEMACARE · CBC REPORT"),
+        createElement("h3", "", "สรุปผลการวิเคราะห์")
+      );
+      reportHeader.append(
+        reportTitleGroup,
+        createElement(
+          "span",
+          `report-status${leukemiaScreeningPattern || idaPattern || macrocyticPattern || normocyticHypochromicPattern || thrombocytopeniaPattern ? " is-ida" : ""}`,
+          reportStatusText
+        )
+      );
+      confirmation.append(reportHeader);
+
+      const reportContent = createElement("div", "report-content");
+      confirmation.append(reportContent);
+
+      const makeSection = (title) => {
+        const section = createElement("section", "report-section");
+        section.append(createElement("h4", "", title));
+        reportContent.append(section);
+        return section;
+      };
+
+      const patientSection = makeSection("ข้อมูลผู้ป่วย");
+      const facts = createElement("dl", "report-facts");
+      for (const [label, value] of [
+        ["ชื่อ-นามสกุล", form.elements.namedItem("fullName").value.trim()],
+        ["HN รหัสผู้ป่วย", form.elements.namedItem("hn").value.trim()],
+        ["อายุ", `${form.elements.namedItem("age").value} ปี`],
+        ["เพศ", `${sex}${trimesterName ? ` · ${trimesterName}` : ""}`],
+        ["น้ำหนัก", `${form.elements.namedItem("weight").value} กก.`],
+        ["ส่วนสูง", `${form.elements.namedItem("height").value} ซม.`]
+      ]) {
+        const fact = createElement("div", "report-fact");
+        fact.append(createElement("dt", "", label), createElement("dd", "", value));
+        facts.append(fact);
+      }
+      patientSection.append(facts);
+
+      const historySection = makeSection("อาการและประวัติ");
+      const historyGrid = createElement("div", "report-history-grid");
+      for (const [title, items] of [
+        ["อาการทางคลินิก", symptoms],
+        ["ประวัติผู้ป่วย", history],
+        ["ประวัติครอบครัว", familyHistory]
+      ]) {
+        const group = createElement("div", "report-history-group");
+        group.append(createElement("h5", "", title));
+        const chipList = createElement("div", "report-chip-list");
+        if (items.length === 0) {
+          chipList.append(createElement("span", "report-empty", "ไม่ได้เลือกรายการ"));
+        } else {
+          for (const item of items) {
+            chipList.append(createElement("span", "report-chip", item));
+          }
+        }
+        group.append(chipList);
+        historyGrid.append(group);
+      }
+      historySection.append(historyGrid);
+
+      const cbcSection = makeSection("ผลตรวจ CBC");
+      const cbcTableWrap = createElement("div", "cbc-table-wrap");
+      const cbcTable = createElement("table", "cbc-table");
+      const tableHead = createElement("thead");
+      const headingRow = createElement("tr");
+      for (const heading of ["รายการตรวจ", "ผลตรวจ", "สถานะ"]) {
+        headingRow.append(createElement("th", "", heading));
+      }
+      tableHead.append(headingRow);
+      const tableBody = createElement("tbody");
+
+      const resultsToDisplay = [
+        ...(Number.isFinite(hemoglobin) ? [{
+          name: "Hb",
+          value: hemoglobin,
+          unit: "g/dL",
+          status: hemoglobinStatus,
+          category: "rbc"
+        }] : []),
+        ...(Number.isFinite(hematocrit) ? [{
+          name: "Hct",
+          value: hematocrit,
+          unit: "%",
+          status: hematocritStatus,
+          category: "rbc"
+        }] : []),
+        ...cbcRanges.map((range) => ({
+          name: range.name,
+          value: readCbcValue(range.id),
+          unit: range.unit,
+          status: range.id === "cbc-mcv" && mcvValue > 110
+            ? "สูงมาก"
+            : range.id === "cbc-plt" && thrombocytopeniaPattern
+              ? thrombocytopeniaSeverity
+              : statusForRange(readCbcValue(range.id), range),
+          category: range.category
+        })).filter((result) => Number.isFinite(result.value)),
+        ...(marrowBlastCells === null
+          ? []
+          : [{
+              name: "Blast cells ในไขกระดูก",
+              value: marrowBlastCells,
+              unit: "%",
+              status: statusForRange(marrowBlastCells, { min: 1.0, max: 4.0 }),
+              category: "wbc"
+            }])
+      ];
+
+      for (const result of resultsToDisplay) {
+        const row = createElement("tr");
+        const nameCell = createElement("td", "", result.name);
+        const valueCell = createElement("td", "cbc-value", `${result.value} ${result.unit}`);
+        const statusCell = createElement("td");
+        const statusClass = result.status === "ต่ำ" ||
+          result.status.startsWith("ต่ำ") ||
+          result.status === "ขาด"
+          ? "is-low"
+          : result.status === "สูง" || result.status === "สูงมาก"
+            ? "is-high"
+            : result.status === "ปกติ" || result.status === "เหมาะสม"
+              ? "is-normal"
+              : "is-unknown";
+        statusCell.append(createElement("span", `cbc-status ${statusClass}`, result.status));
+        const displayedValue = result.unit
+          ? `${result.value} ${result.unit}`
+          : String(result.value);
+        valueCell.textContent = displayedValue;
+        row.append(nameCell, valueCell, statusCell);
+        tableBody.append(row);
+      }
+
+      cbcTable.append(tableHead, tableBody);
+      cbcTableWrap.append(cbcTable);
+      cbcSection.append(cbcTableWrap);
+
+      const summarySection = createElement(
+        "section",
+        `report-summary${leukemiaScreeningPattern || idaPattern || macrocyticPattern || normocyticHypochromicPattern || thrombocytopeniaPattern ? " is-ida" : ""}`
+      );
+      summarySection.append(createElement("h4", "", "คำแปลผล"));
+      if (leukemiaWithThrombocytopeniaPattern) {
+        const wbcCount = readCbcValue("cbc-wbc");
+        const lymphocytePercentage = readCbcValue("cbc-lymp");
+        const neutrophilPercentage = readCbcValue("cbc-neutp");
+        const monocytePercentage = readCbcValue("cbc-monop");
+        const eosinophilPercentage = readCbcValue("cbc-eosp");
+        const hgbLimit = hemoglobinRange.min;
+        const hctLimit = leukemiaHctMinimum;
+        const rbcLimit = sexSpecificRbcRange.min;
+        const redCellFindings = [
+          `Hb ${hemoglobin} g/dL${hemoglobin < hgbLimit ? ` ต่ำกว่าเกณฑ์ ${hgbLimit}` : ` ไม่ต่ำกว่าเกณฑ์ ${hgbLimit}`}`,
+          `Hct ${hematocrit}%${hematocrit < hctLimit ? ` ต่ำกว่าเกณฑ์ ${hctLimit}%` : ` ไม่ต่ำกว่าเกณฑ์ ${hctLimit}%`}`,
+          `RBC ${redBloodCellCount} M/uL${redBloodCellCount < rbcLimit ? ` ต่ำกว่าเกณฑ์ ${rbcLimit}` : ` ไม่ต่ำกว่าเกณฑ์ ${rbcLimit}`}`
+        ].join(", ");
+        const wbcFinding = wbcCount > 11.0
+          ? `WBC ${wbcCount} K/uL สูงกว่า 11.0 K/uL`
+          : wbcCount < 4.0
+            ? `WBC ${wbcCount} K/uL ต่ำกว่า 4.0 K/uL`
+            : `WBC ${wbcCount} K/uL อยู่ในช่วง 4.0–11.0 K/uL`;
+        const differentialPattern =
+          lymphocytePercentage >= 74.0 && neutrophilPercentage < 20.0
+            ? "พบสัดส่วน LYM เด่นร่วมกับ NEUT ต่ำ ซึ่งอาจพบในความผิดปกติของสาย lymphocyte"
+            : neutrophilPercentage > 74.0 || monocytePercentage > 12.0
+              ? "พบ NEUTp หรือ MONOp สูงกว่าช่วงอ้างอิง ซึ่งอาจพบในความผิดปกติของสาย myeloid"
+              : "สัดส่วนเม็ดเลือดขาวไม่แสดงรูปแบบเด่นตามเกณฑ์ข้างต้น";
+        const redCellAbnormal = anemia || lowHct || redBloodCellCount < rbcLimit;
+        const wbcAbnormal = wbcCount > 11.0 || wbcCount < 4.0;
+        const differentialAbnormal =
+          lymphocytePercentage < 26.0 ||
+          lymphocytePercentage > 46.0 ||
+          neutrophilPercentage < 49.0 ||
+          neutrophilPercentage > 74.0 ||
+          monocytePercentage < 2.0 ||
+          monocytePercentage > 12.0 ||
+          eosinophilPercentage > 5.0;
+        const abnormalWbcDescription = [
+          wbcAbnormal
+            ? wbcCount > 11.0
+              ? `WBC ${wbcCount} K/uL สูงกว่าเกณฑ์ 11.0 K/uL`
+              : `WBC ${wbcCount} K/uL ต่ำกว่าเกณฑ์ 4.0 K/uL`
+            : "",
+          differentialAbnormal
+            ? `สัดส่วนเม็ดเลือดขาวเสียสมดุล (NEUTp ${neutrophilPercentage}%, LYMp ${lymphocytePercentage}%, MONOp ${monocytePercentage}%, EOSp ${eosinophilPercentage}%)`
+            : "",
+          blastCells > 0
+            ? `ตรวจพบ Blast cells ${blastCells}% ในเลือด`
+            : ""
+        ].filter(Boolean).join(" และ ");
+        const confirmatoryTests = [
+          "สเมียร์เลือด (Peripheral Blood Smear; PBS) จาก EDTA blood เพื่อประเมินรูปร่างและสัดส่วนเซลล์ ตรวจหา Blast cells และดูขนาดหรือการเกาะกลุ่มของเกล็ดเลือด",
+          "ตรวจไขกระดูก (Bone Marrow Aspiration and Biopsy) เพื่อประเมินเซลล์ผิดปกติ ความหนาแน่นของไขกระดูก (Cellularity) และ Megakaryocytes ตามดุลยพินิจแพทย์",
+          "ตรวจจำแนกชนิดเซลล์และพันธุกรรม (Flow Cytometry, Cytogenetics/Molecular) เช่น BCR-ABL1 เมื่อแพทย์เห็นข้อบ่งชี้",
+          "ตรวจการแข็งตัวของเลือด (Coagulation Profile) ได้แก่ PT, aPTT, Fibrinogen และ D-dimer เพื่อประเมินเลือดออกและภาวะ DIC ตามความเหมาะสม"
+        ];
+        summarySection.append(
+          createElement(
+            "p",
+            "",
+            `ผลเลือดมีรูปแบบเข้าข่ายภาวะมะเร็งเม็ดเลือดขาวร่วมกับเกล็ดเลือดต่ำ (Leukemia with Thrombocytopenia) โดยพบ${redCellAbnormal ? `ค่าความสมบูรณ์ของเม็ดเลือดแดงเข้าได้กับภาวะโลหิตจาง (Anemia): Hb ${hemoglobin} g/dL, Hct ${hematocrit}% และ RBC ${redBloodCellCount} M/uL ต่ำกว่าเกณฑ์ที่กำหนด` : `ยังไม่พบค่า Hb, Hct และ RBC ต่ำครบตามเกณฑ์ภาวะโลหิตจาง (Hb ${hemoglobin} g/dL, Hct ${hematocrit}%, RBC ${redBloodCellCount} M/uL)`} ร่วมกับปริมาณเกล็ดเลือด (PLT ${plateletCount} K/uL) ต่ำ${plateletcrit < 0.1 ? ` และปริมาตรเกล็ดเลือดอัดแน่น (PCT ${plateletcrit} K/uL) ต่ำ` : ""}${abnormalWbcDescription ? ` นอกจากนี้ยังพบ${abnormalWbcDescription}` : " และควรพิจารณาค่าเม็ดเลือดขาวร่วมกับผลตรวจอื่น"} รูปแบบความผิดปกติหลายสาย (Multilineage) นี้อาจพบได้ในโรคของไขกระดูก รวมถึงมะเร็งเม็ดเลือดขาวบางชนิด แต่ CBC เพียงอย่างเดียวไม่สามารถยืนยัน Leukemia หรือระบุชนิดได้ จึงควรส่งตรวจเพิ่มเติมเพื่อยืนยัน`
+          ),
+          createElement("p", "", `ดัชนีเม็ดเลือดแดง: ${redCellFindings} (เกณฑ์ Hb ต่ำกว่า ${hgbLimit} g/dL, Hct ต่ำกว่า ${hctLimit}% และ RBC ต่ำกว่า ${rbcLimit} M/uL สำหรับ${isMale ? "เพศชาย" : isPregnant ? `หญิงตั้งครรภ์ ${trimesterName}` : "เพศหญิง"})`),
+          createElement(
+            "p",
+            "",
+            `ดัชนีเกล็ดเลือด: PLT ${plateletCount} K/uL ต่ำกว่า 150 K/uL${plateletcrit < 0.1 ? ` และ PCT ${plateletcrit} K/uL ต่ำกว่า 0.1 K/uL แสดงปริมาตรรวมเกล็ดเลือดลดลง` : `; PCT ${plateletcrit} K/uL${plateletcrit <= 0.25 ? " ไม่ต่ำกว่า 0.1 K/uL" : " สูงกว่า 0.25 K/uL"}`}. ภาวะเกล็ดเลือดต่ำพบได้จากหลายสาเหตุและไม่จำเพาะต่อ Leukemia`
+          ),
+          createElement(
+            "p",
+            "",
+            `ดัชนีเม็ดเลือดขาว: ${wbcFinding}; LYMp ${lymphocytePercentage}% (อ้างอิง 26–46%), NEUTp ${neutrophilPercentage}% (49–74%), MONOp ${monocytePercentage}% (2–12%), EOSp ${eosinophilPercentage}% (0–5%). ${differentialPattern} แต่สัดส่วนเหล่านี้ไม่สามารถใช้วินิจฉัยหรือจำแนก ALL/CLL/AML/CML ได้โดยลำพัง`
+          ),
+          createElement(
+            "p",
+            "",
+            `Blast cells ในเลือด ${blastCells}% (ค่าปกติ 0%)${marrowBlastCells === null ? "; ไม่ได้ระบุค่า Blast cells ในไขกระดูก ซึ่งมีช่วงอ้างอิง 1–4%" : `; Blast cells ในไขกระดูก ${marrowBlastCells}% (ช่วงอ้างอิง 1–4%)`}`
+          ),
+          createElement("p", "", "แนะนำให้แพทย์ประเมินและพิจารณาตรวจเพิ่มเติมเพื่อยืนยันตามความเหมาะสม:"),
+          ...confirmatoryTests.map((test, index) =>
+            createElement("p", "", `${index + 1}. ${test}`)
+          ),
+          createElement(
+            "p",
+            "",
+            "หากมีเลือดออกไม่หยุด ไข้สูง หรืออาการทรุดลง ควรเข้ารับการประเมินทางการแพทย์โดยเร็ว"
+          )
+        );
+      } else if (leukemiaWithAnemiaPattern) {
+        const wbcCount = readCbcValue("cbc-wbc");
+        const lymphocytePercentage = readCbcValue("cbc-lymp");
+        const neutrophilPercentage = readCbcValue("cbc-neutp");
+        const monocytePercentage = readCbcValue("cbc-monop");
+        const eosinophilPercentage = readCbcValue("cbc-eosp");
+        const hgbLimit = hemoglobinRange.min;
+        const hctLimit = leukemiaHctMinimum;
+        const rbcLimit = sexSpecificRbcRange.min;
+        const wbcFinding = wbcCount > 11.0
+          ? `WBC ${wbcCount} K/uL สูงกว่า 11.0 K/uL`
+          : wbcCount < 4.0
+            ? `WBC ${wbcCount} K/uL ต่ำกว่า 4.0 K/uL`
+            : `WBC ${wbcCount} K/uL อยู่ในช่วง 4.0–11.0 K/uL`;
+        const redCellFindings = [
+          `Hb ${hemoglobin} g/dL (เกณฑ์ภาวะโลหิตจาง <${hgbLimit} g/dL)`,
+          `Hct ${hematocrit}% (เกณฑ์คัดกรอง <${hctLimit}%)`,
+          `RBC ${redBloodCellCount} M/uL (เกณฑ์คัดกรอง <${rbcLimit} M/uL)`
+        ].join(", ");
+        const abnormalDifferential = [
+          neutrophilPercentage < 49.0 ? `NEUTp ${neutrophilPercentage}% ต่ำกว่า 49%` : "",
+          lymphocytePercentage < 26.0 ? `LYMp ${lymphocytePercentage}% ต่ำกว่า 26%` : "",
+          monocytePercentage < 2.0 ? `MONOp ${monocytePercentage}% ต่ำกว่า 2%` : "",
+          eosinophilPercentage < 0.0 ? `EOSp ${eosinophilPercentage}% ต่ำกว่า 0%` : "",
+          lymphocytePercentage >= 74.0 && neutrophilPercentage < 20.0
+            ? `LYMp ${lymphocytePercentage}% สูงร่วมกับ NEUTp ${neutrophilPercentage}% ต่ำ`
+            : "",
+          neutrophilPercentage > 74.0 ? `NEUTp ${neutrophilPercentage}% สูงกว่า 74%` : "",
+          monocytePercentage > 12.0 ? `MONOp ${monocytePercentage}% สูงกว่า 12%` : ""
+        ].filter(Boolean);
+        const differentialDescription = abnormalDifferential.length > 0
+          ? `พบความผิดปกติของสัดส่วนเม็ดเลือดขาว: ${abnormalDifferential.join(", ")}`
+          : `สัดส่วนเม็ดเลือดขาวที่กรอกคือ NEUTp ${neutrophilPercentage}%, LYMp ${lymphocytePercentage}%, MONOp ${monocytePercentage}% และ EOSp ${eosinophilPercentage}%`;
+        const blastDescription = blastCells > 0
+          ? `ตรวจพบ Blast cells ${blastCells}% ในเลือด (ค่าปกติ 0%)`
+          : marrowBlastAbnormal
+            ? `Blast cells ในเลือด ${blastCells}% (ค่าปกติ 0%) และ Blast cells ในไขกระดูก ${marrowBlastCells}% อยู่นอกช่วงอ้างอิง 1–4%`
+            : `ไม่พบ Blast cells ในเลือด (ผล ${blastCells}%, ค่าปกติ 0%)${marrowBlastCells === null ? "" : `; Blast cells ในไขกระดูก ${marrowBlastCells}% (ช่วงอ้างอิง 1–4%)`}`;
+        const confirmatoryTests = [
+          "สเมียร์เลือด (Peripheral Blood Smear; PBS) เพื่อประเมินรูปร่างเม็ดเลือดและตรวจหา Blast cells",
+          "ตรวจไขกระดูก (Bone Marrow Aspiration and Biopsy) เพื่อประเมิน Cellularity, Morphology และสัดส่วน Blast cells เมื่อแพทย์เห็นข้อบ่งชี้",
+          "Flow Cytometry (Immunophenotyping) เพื่อจำแนกสายเซลล์ และ Cytogenetic/Molecular testing เช่น Karyotyping, BCR-ABL1 หรือการตรวจยีนที่แพทย์เห็นเหมาะสม",
+          "ประเมินภาวะแทรกซ้อนและการทำงานของอวัยวะตามความเหมาะสม เช่น Uric Acid, LDH, BUN/Creatinine, Electrolytes, AST/ALT และ Coagulation Profile (PT, aPTT, Fibrinogen); พิจารณา D-dimer เมื่อสงสัย DIC",
+          "Lumbar Puncture (CSF) หรือ Imaging พิจารณาเฉพาะเมื่อมีข้อบ่งชี้ทางคลินิกและแพทย์ผู้เชี่ยวชาญเห็นสมควร"
+        ];
+        summarySection.append(
+          createElement(
+            "p",
+            "",
+            `ผลตรวจ CBC พบภาวะโลหิตจาง (Anemia) โดย ${redCellFindings} ร่วมกับ ${wbcFinding}${abnormalDifferential.length > 0 ? ` และ ${differentialDescription}` : `; ${differentialDescription}`}. ${blastDescription}. รูปแบบนี้อาจสัมพันธ์กับความผิดปกติของไขกระดูก รวมถึงมะเร็งเม็ดเลือดขาว แต่ไม่สามารถระบุได้ว่าโลหิตจางเกิดจาก Leukemia หรือยืนยัน Leukemia จาก CBC เพียงอย่างเดียว`
+          ),
+          createElement(
+            "p",
+            "",
+            `เกล็ดเลือด: PLT ${plateletCount} K/uL${plateletCount >= 150 && plateletCount <= 400 ? " อยู่ในช่วงอ้างอิง 150–400 K/uL" : plateletCount > 400 ? " สูงกว่า 400 K/uL" : ` ต่ำกว่า 150 K/uL`}. ควรแปลผลร่วมกับเม็ดเลือดทุกสายและ Peripheral Blood Smear`
+          ),
+          createElement(
+            "p",
+            "",
+            `สรุปค่าที่ใช้คัดกรอง: เกณฑ์ Hb ต่ำกว่า ${hgbLimit} g/dL, Hct ต่ำกว่า ${hctLimit}% และ RBC ต่ำกว่า ${rbcLimit} M/uL สำหรับ${isMale ? "เพศชาย" : isPregnant ? `หญิงตั้งครรภ์ ${trimesterName}` : "เพศหญิง"}; WBC นอกช่วง 4.0–11.0 K/uL และ Blast ในเลือดควรเป็น 0%`
+          ),
+          createElement("p", "", "แนะนำให้แพทย์ประเมินอาการ CBC และ Peripheral Blood Smear ร่วมกัน และพิจารณาการตรวจเพิ่มเติมตามข้อบ่งชี้:"),
+          ...confirmatoryTests.map((test, index) =>
+            createElement("p", "", `${index + 1}. ${test}`)
+          ),
+          createElement(
+            "p",
+            "",
+            "หากมีไข้สูงต่อเนื่อง เลือดออกไม่หยุด หายใจลำบาก หรืออาการทรุดลง ควรเข้ารับการประเมินทางการแพทย์โดยเร็ว"
+          )
+        );
+      } else if (leukemiaScreeningPattern) {
+        const wbcCount = readCbcValue("cbc-wbc");
+        const lymphocytePercentage = readCbcValue("cbc-lymp");
+        const neutrophilPercentage = readCbcValue("cbc-neutp");
+        const monocytePercentage = readCbcValue("cbc-monop");
+        const eosinophilPercentage = readCbcValue("cbc-eosp");
+        const wbcInterpretation = wbcCount > 11.0
+          ? `WBC ${wbcCount} K/uL สูงกว่า 11.0 K/uL`
+          : wbcCount < 4.0
+            ? `WBC ${wbcCount} K/uL ต่ำกว่า 4.0 K/uL`
+            : `WBC ${wbcCount} K/uL อยู่ในช่วง 4.0–11.0 K/uL`;
+        const plateletInterpretation = thrombocytopeniaPattern
+          ? `PLT ${plateletCount} K/uL ต่ำกว่า 150 K/uL${plateletcrit < 0.1 ? ` ร่วมกับ PCT ${plateletcrit} K/uL ต่ำกว่า 0.1 K/uL` : ""}`
+          : thrombocytosisPattern
+            ? `PLT ${plateletCount} K/uL สูงกว่า 400 K/uL${plateletDistributionWidth > 17.0 || meanPlateletVolume > 11.0 ? ` ร่วมกับ ${[
+                plateletDistributionWidth > 17.0 ? `PDW ${plateletDistributionWidth}% สูงกว่า 17.0%` : "",
+                meanPlateletVolume > 11.0 ? `MPV ${meanPlateletVolume} fL สูงกว่า 11.0 fL` : ""
+              ].filter(Boolean).join(" และ ")}` : ""}`
+            : plateletDistributionWidth > 17.0 && meanPlateletVolume > 11.0
+              ? `PDW ${plateletDistributionWidth}% และ MPV ${meanPlateletVolume} fL สูงกว่าช่วงอ้างอิง`
+              : plateletcrit < 0.1
+                ? `PCT ${plateletcrit} K/uL ต่ำกว่า 0.1 K/uL`
+                : `PLT ${plateletCount} K/uL อยู่ในช่วงอ้างอิง`;
+        const differentialInterpretation =
+          lymphocytePercentage >= 74.0 && neutrophilPercentage < 20.0 && monocytePercentage < 2.0
+            ? `สัดส่วนเม็ดเลือดขาวมีลักษณะ lymphocyte เด่น (LYMp ${lymphocytePercentage}%, NEUTp ${neutrophilPercentage}%, MONOp ${monocytePercentage}%, EOSp ${eosinophilPercentage}%)`
+            : neutrophilPercentage > 74.0 || monocytePercentage > 12.0
+              ? `พบสัดส่วนเม็ดเลือดขาวกลุ่ม myeloid สูงกว่าช่วงอ้างอิง (NEUTp ${neutrophilPercentage}%, MONOp ${monocytePercentage}%; LYMp ${lymphocytePercentage}%, EOSp ${eosinophilPercentage}%)`
+              : `สัดส่วนเม็ดเลือดขาวที่กรอก: LYMp ${lymphocytePercentage}%, NEUTp ${neutrophilPercentage}%, MONOp ${monocytePercentage}%, EOSp ${eosinophilPercentage}%`;
+        summarySection.append(
+          createElement(
+            "p",
+            "",
+            blastCells > 0
+              ? `ตรวจพบ Blast cells ${blastCells}% ในเลือดส่วนปลาย ซึ่งค่าปกติควรเป็น 0% ${thrombocytopeniaPattern ? `และพบเกล็ดเลือดต่ำ (PLT ${plateletCount} K/uL)` : ""} ผลนี้เป็นสัญญาณผิดปกติที่ต้องให้แพทย์ประเมินโดยเร็ว ไม่สามารถยืนยัน Leukemia หรือระบุชนิด AML/ALL/CML จาก CBC เพียงอย่างเดียว`
+              : marrowBlastAbnormal
+                ? `พบ Blast cells ในไขกระดูก ${marrowBlastCells}% ซึ่งอยู่นอกช่วงอ้างอิง 1–4% ควรให้แพทย์เฉพาะทางแปลผลร่วมกับผลตรวจอื่น ข้อมูลนี้เพียงอย่างเดียวไม่ยืนยัน Leukemia`
+              : leukemiaAbnormalLineCount >= 2
+                ? `พบความผิดปกติใน CBC ตั้งแต่สองสายเซลล์ขึ้นไป (WBC ${readCbcValue("cbc-wbc")} K/uL, Hb ${hemoglobin} g/dL, Hct ${hematocrit}%, RBC ${redBloodCellCount} M/uL, PLT ${plateletCount} K/uL) ซึ่งอาจเกิดได้จากหลายสาเหตุและควรได้รับการประเมินโดยแพทย์ ไม่ได้ยืนยันว่าเป็น Leukemia`
+                : `พบ WBC ${readCbcValue("cbc-wbc")} K/uL นอกช่วงอ้างอิง 4.0–11.0 K/uL ควรแปลผลร่วมกับอาการและการตรวจอื่น ความผิดปกตินี้เพียงอย่างเดียวไม่สามารถยืนยัน Leukemia ได้`
+          ),
+          createElement(
+            "p",
+            "",
+            `ค่าเม็ดเลือดแดง: Hb ${hemoglobin} g/dL (${isMale ? "เกณฑ์ต่ำกว่า 13" : isPregnant ? `เกณฑ์ต่ำกว่า ${trimesterValue === "2" ? "10.5" : "11.0"} ตามไตรมาส` : "เกณฑ์ต่ำกว่า 12"}), Hct ${hematocrit}% (เกณฑ์คัดกรองนี้ใช้ต่ำกว่า ${leukemiaHctMinimum}% สำหรับ${isMale ? "เพศชาย" : isPregnant ? trimesterName : "เพศหญิง"}), RBC ${redBloodCellCount} M/uL (เกณฑ์ต่ำกว่า ${sexSpecificRbcRange.min} M/uL)`
+          ),
+          createElement(
+            "p",
+            "",
+            `ค่าเม็ดเลือดขาวและเกล็ดเลือด: ${wbcInterpretation}; ${plateletInterpretation}`
+          ),
+          createElement(
+            "p",
+            "",
+            `${differentialInterpretation}. สัดส่วนเหล่านี้อาจผิดปกติได้จากหลายสาเหตุและไม่สามารถใช้แยกชนิด ALL/CLL หรือ AML/CML ได้โดยลำพัง`
+          ),
+          createElement(
+            "p",
+            "",
+            `Blast cells ในเลือด ${blastCells}% (ค่าปกติ 0%)${marrowBlastCells === null ? "; ไม่ได้กรอกผล Blast cells ในไขกระดูก (ช่วงอ้างอิง 1–4%)" : `; Blast cells ในไขกระดูก ${marrowBlastCells}% (ช่วงอ้างอิง 1–4%)`}`
+          ),
+          createElement(
+            "p",
+            "",
+            "ควรติดต่อแพทย์เพื่อพิจารณาทบทวน CBC และสเมียร์เลือด (Peripheral Blood Smear) โดยเร็ว โดยเฉพาะเมื่อพบ Blast cells หรือมีเกล็ดเลือดต่ำร่วมกับความผิดปกติของเม็ดเลือดขาว/เม็ดเลือดแดง; แพทย์อาจพิจารณาตรวจไขกระดูกตามข้อบ่งชี้"
+          ),
+          createElement(
+            "p",
+            "",
+            "ช่วงอ้างอิงของ LYMp, NEUTp, MONOp และ EOSp ในแบบฟอร์มใช้ร่วมกันทุกเพศตามค่าที่กำหนด แต่ค่าจริงอาจต่างกันตามห้องปฏิบัติการ ควรใช้ช่วงอ้างอิงบนใบผลตรวจและไม่ใช้เปอร์เซ็นต์เม็ดเลือดขาวเพียงอย่างเดียวระบุชนิดของโรค"
+          )
+        );
+      } else if (thrombocytopeniaPattern) {
+        const peripheralDestructionPattern =
+          Number.isFinite(plateletcrit) &&
+          Number.isFinite(plateletDistributionWidth) &&
+          plateletcrit < 0.1 &&
+          plateletDistributionWidth > 17.0;
+        const anemiaWithThrombocytopenia = anemia && lowHct;
+        const hemoglobinAndHematocritProvided =
+          Number.isFinite(hemoglobin) && Number.isFinite(hematocrit);
+        const normalHbAndHct =
+          hemoglobinAndHematocritProvided &&
+          !anemia &&
+          !lowHct;
+        const plateletcritInterpretation = !Number.isFinite(plateletcrit)
+          ? "ไม่ได้กรอกค่า PCT จึงไม่สามารถแปลผลปริมาตรรวมของเกล็ดเลือดได้"
+          : plateletcrit < 0.1
+          ? "PCT ต่ำกว่า 0.1 K/uL หมายถึงปริมาตรรวมของเกล็ดเลือดในกระแสเลือดต่ำ อาจสัมพันธ์กับการสร้างเกล็ดเลือดลดลง เช่น ไขกระดูกทำงานลดลงหรือขาดสารอาหาร"
+          : plateletcrit > 0.25
+            ? "PCT สูงกว่า 0.25 K/uL อาจสัมพันธ์กับการใช้หรือทำลายเกล็ดเลือดมากขึ้น เช่น ITP การติดเชื้อไวรัส หรือม้ามโต"
+            : "PCT อยู่ในช่วงอ้างอิง 0.1–0.25 K/uL";
+        let plateletPatternInterpretation = "";
+        if (plateletDistributionWidth > 17.0 && meanPlateletVolume > 11.0) {
+          plateletPatternInterpretation = peripheralDestructionPattern
+            ? "พบ PLT และ PCT ต่ำร่วมกับ PDW และ MPV สูง รูปแบบนี้อาจสนับสนุนการทำลาย/ใช้เกล็ดเลือดในกระแสเลือดและการปล่อยเกล็ดเลือดขนาดใหญ่จากไขกระดูก แต่ไม่สามารถยืนยันสาเหตุได้จาก CBC เพียงอย่างเดียว"
+            : "PDW และ MPV สูงร่วมกัน แสดงความแปรปรวนของขนาดและขนาดเฉลี่ยเกล็ดเลือดที่สูง อาจพบเกล็ดเลือดตัวอ่อนขนาดใหญ่จำนวนมาก ควรแปลผลร่วมกับ PLT, PCT และอาการ";
+        } else if (peripheralDestructionPattern) {
+          plateletPatternInterpretation = "พบ PLT และ PCT ต่ำร่วมกับ PDW สูง อาจสนับสนุนการทำลายหรือใช้เกล็ดเลือดในกระแสเลือดอย่างรวดเร็ว แต่ไม่สามารถยืนยันกลไกหรือสาเหตุได้จาก CBC เพียงอย่างเดียว";
+        } else if (plateletDistributionWidth > 17.0 && plateletCount >= 150) {
+          plateletPatternInterpretation = "PDW สูงแต่จำนวนเกล็ดเลือดอยู่ในช่วงปกติ อาจสัมพันธ์กับการอักเสบเล็กน้อย";
+        } else if (plateletDistributionWidth > 17.0) {
+          plateletPatternInterpretation = "PDW สูง แสดงความแปรปรวนของขนาดเกล็ดเลือด ควรพิจารณาร่วมกับ MPV, PCT และผลตรวจอื่น";
+        } else if (meanPlateletVolume > 11.0) {
+          plateletPatternInterpretation = "MPV สูงกว่า 11 fL หมายถึงขนาดเฉลี่ยเกล็ดเลือดสูง ควรแปลผลร่วมกับจำนวนเกล็ดเลือดและอาการ";
+        }
+        const bleedingRisk = plateletCount < 20
+          ? "PLT ต่ำกว่า 20 K/uL: มีความเสี่ยงสูงต่อเลือดออกเอง รวมถึงเลือดออกในอวัยวะภายใน ควรได้รับการดูแลจากแพทย์อย่างใกล้ชิด"
+          : plateletCount < 50
+            ? "PLT ต่ำกว่า 50 K/uL: เริ่มเสี่ยงต่อเลือดออกง่ายหรือหยุดยาก เช่น ฟกช้ำ จ้ำเลือด เลือดกำเดาไหล เลือดออกตามไรฟัน หรือประจำเดือนมามากผิดปกติ"
+            : plateletCount < 100
+              ? "PLT 50–99 K/uL: เกล็ดเลือดต่ำ ควรติดตามและประเมินร่วมกับอาการและสาเหตุ"
+              : "PLT 100–149 K/uL: เกล็ดเลือดต่ำเล็กน้อย โดยทั่วไปมักไม่มีเลือดออกผิดปกติรุนแรง";
+        const plateletWorkup = [
+          "สเมียร์เลือด (Peripheral Blood Smear; PBS) เพื่อดูรูปร่างและขนาดเกล็ดเลือด รวมถึง Large/Giant Platelets",
+          "ตรวจ CBC ซ้ำด้วยหลอด Citrate หรือ Heparin เพื่อยืนยันผลและแยกเกล็ดเลือดเกาะกลุ่มเทียมจาก EDTA",
+          "ตรวจการแข็งตัวของเลือด เช่น PT, aPTT และ Fibrinogen เพื่อประเมินความผิดปกติของการแข็งตัวและการใช้เกล็ดเลือด",
+          "พิจารณาตรวจ Bone Marrow Aspiration and Biopsy เพื่อประเมิน Megakaryocytes เมื่อสงสัยความผิดปกติของไขกระดูกหรือโรคเลือดอื่น"
+        ];
+        const combinedBloodCountInterpretation = anemiaWithThrombocytopenia
+          ? `ผลเลือดภาพรวมเข้าข่ายภาวะโลหิตจาง (Anemia) ร่วมกับภาวะเกล็ดเลือดต่ำ (Thrombocytopenia) โดย Hb ${hemoglobin} g/dL และ Hct ${hematocrit}% ต่ำกว่าเกณฑ์ ร่วมกับ PLT ${plateletCount} K/uL และ PCT ${plateletcrit} K/uL ต่ำ${peripheralDestructionPattern ? ` ขณะที่ PDW ${plateletDistributionWidth}% สูง สนับสนุนการทำลายหรือใช้เกล็ดเลือดในกระแสเลือดและการเร่งปล่อยเกล็ดเลือดใหม่จากไขกระดูก` : ` ทั้งนี้ PDW ${plateletDistributionWidth}% ${plateletDistributionWidth > 17 ? "สูง" : "ไม่สูง"} จึงยังไม่สามารถสรุปกลไกการทำลายเกล็ดเลือดจากรูปแบบนี้ได้`}`
+          : normalHbAndHct
+            ? `ผลเลือดเข้าข่ายภาวะเกล็ดเลือดต่ำ (Thrombocytopenia) โดย Hb ${hemoglobin} g/dL และ Hct ${hematocrit}% อยู่ในเกณฑ์ ไม่พบภาวะโลหิตจางร่วมด้วย${peripheralDestructionPattern ? ` พบ PLT ${plateletCount} K/uL และ PCT ${plateletcrit} K/uL ต่ำร่วมกับ PDW ${plateletDistributionWidth}% สูง ซึ่งสนับสนุนการทำลายหรือใช้เกล็ดเลือดในกระแสเลือด และการเร่งปล่อยเกล็ดเลือดตัวอ่อนขนาดใหญ่ออกมาทดแทน` : ` โดย PLT ${plateletCount} K/uL ต่ำกว่าเกณฑ์ ทั้งนี้ผล PDW ${plateletDistributionWidth}% และ PCT ${plateletcrit} K/uL ยังไม่แสดงรูปแบบครบสำหรับสนับสนุนการทำลาย/ใช้เกล็ดเลือดโดยเฉพาะ`}`
+            : hemoglobinAndHematocritProvided
+              ? `ผลเลือดเข้าข่ายภาวะเกล็ดเลือดต่ำ (Thrombocytopenia) โดย PLT ${plateletCount} K/uL ต่ำกว่าเกณฑ์ ร่วมกับ Hb ${hemoglobin} g/dL และ Hct ${hematocrit}% ซึ่งให้ผลไม่สอดคล้องกันตามเกณฑ์โลหิตจาง จึงควรให้แพทย์ประเมินร่วมกับบริบททางคลินิก`
+              : `ผลเลือดพบภาวะเกล็ดเลือดต่ำ (Thrombocytopenia) โดย PLT ${plateletCount} K/uL ต่ำกว่าเกณฑ์ ส่วน Hb/Hct ไม่ได้กรอก จึงยังประเมินภาวะโลหิตจางร่วมด้วยไม่ได้`;
+        summarySection.append(
+          createElement(
+            "p",
+            "",
+            combinedBloodCountInterpretation
+          ),
+          createElement(
+            "p",
+            "",
+            `PLT ${plateletCount} K/uL (ค่าปกติ 150–400 K/uL) จัดอยู่ในระดับ${thrombocytopeniaSeverity} · เกณฑ์แบ่งระดับ: 100–149 K/uL ต่ำเล็กน้อย, 50–99 K/uL ต่ำปานกลาง, 20–49 K/uL ต่ำรุนแรง และ <20 K/uL ต่ำมาก/อันตราย`
+          ),
+          ...(plateletPatternInterpretation
+            ? [createElement("p", "", plateletPatternInterpretation)]
+            : []),
+          createElement("p", "", plateletcritInterpretation),
+          createElement("p", "", bleedingRisk),
+          createElement(
+            "p",
+            "",
+            `แนะนำให้แพทย์ตรวจยืนยันเพิ่มเติม ได้แก่: ${plateletWorkup.join(" · ")}`
+          ),
+          createElement(
+            "p",
+            "",
+            "ควรให้แพทย์ประเมินความเสี่ยงเลือดออกและแปลผลร่วมกับอาการ ยา ประวัติสุขภาพ และผลตรวจอื่น หากมีเลือดออกไม่หยุดหรือสงสัยเลือดออกภายใน ให้เข้ารับการประเมินทางการแพทย์โดยเร็ว"
+          )
+        );
+        if (macrocyticPattern) {
+          summarySection.append(createElement(
+            "p",
+            "",
+            "พบรูปแบบ Macrocytic Anemia ร่วมด้วยจากค่า Hb/Hct และ MCV ที่เข้าเกณฑ์"
+          ));
+        }
+        if (normocyticHypochromicPattern) {
+          summarySection.append(createElement(
+            "p",
+            "",
+            "พบรูปแบบ Normocytic Hypochromic Anemia ร่วมด้วยจากค่า Hb ต่ำ, MCV อยู่ในช่วง 80–100 fL, MCH <27 pg, MCHC <31 g/dL และ RBC ต่ำหรืออยู่ในเกณฑ์ตามเพศ"
+          ));
+        }
+      } else if (macrocyticPattern) {
+        summarySection.append(
+          createElement(
+            "p",
+            "",
+            "ผลเลือดเข้าข่ายเป็นโรคโลหิตจาง (Anemia) จากภาวะเม็ดเลือดแดงขนาดใหญ่ (Macrocytic Anemia) เนื่องจากพบภาวะโลหิตจางร่วมกับเม็ดเลือดแดงมีขนาดใหญ่กว่าปกติอย่างชัดเจน ทั้งนี้อาจพบภาวะเม็ดเลือดขาวและเกล็ดเลือดต่ำ ซึ่งอาจเกิดจากการขาดวิตามินอย่างรุนแรงจนไขกระดูกถูกกดการสร้าง"
+          ),
+          createElement(
+            "p",
+            "",
+            "แนะนำให้แพทย์ส่งตรวจเพิ่มเติมเพื่อยืนยัน โดยส่งตรวจ Serum Vitamin B12 และ RBC Folate เป็นลำดับแรก (หรือ Serum Folate) หาก Vitamin B12 อยู่ในระดับก้ำกึ่ง (100–400 pg/mL) แนะนำให้ส่งตรวจสารเมตาบอไลต์ ได้แก่ Methylmalonic Acid (MMA) และ Homocysteine เพื่อแยกภาวะขาดวิตามิน B12 ออกจากการขาด Folate และพิจารณาส่งตรวจฟิล์มเลือด (Peripheral Blood Smear) เพื่อดูลักษณะ Hypersegmented Neutrophils"
+          )
+        );
+      } else if (normocyticHypochromicPattern) {
+        const giBleedingHistory = history.some((item) => [
+          "อุจจาระเหมือนยางมะตอย (GIB)",
+          "อุจจาระเป็นเลือด",
+          "ใช้ยากลุ่ม NSAIDs",
+          "ใช้ยา NSAIDs หรือ aspirin เป็นเวลานาน",
+          "เลือดออกจากเนื้องอกมดลูกหรือเยื่อบุโพรงมดลูกเจริญผิดที่",
+          "แผลในกระเพาะอาหารหรือลำไส้เล็ก ริดสีดวง หรือติ่งเนื้อลำไส้ใหญ่",
+          "มะเร็งกระเพาะอาหารหรือมะเร็งลำไส้ใหญ่",
+          "ติดเชื้อ Helicobacter pylori (H. pylori)",
+          "โรคลำไส้อักเสบ (IBD)",
+          "น้ำหนักลดฮวบ"
+        ].includes(item));
+        const relevantFamilyHistory = familyHistory.some((item) => [
+          "คนในครอบครัวเป็นโรคโลหิตจาง",
+          "ครอบครัวเป็นโรคธาลัสซีเมีย",
+          "ครอบครัวเป็นโรคขาดเอนไซม์ G6PD",
+          "คนในครอบครัวมีประวัติตัวเหลือง ซีด หรือต้องรับเลือดบ่อย"
+        ].includes(item));
+        const chronicInflammationHistory = history.includes("วัณโรค (TB)");
+
+        summarySection.append(
+          createElement(
+            "p",
+            "",
+            `ผลเลือดเข้าข่ายเป็นโรคโลหิตจาง (Anemia) ชนิดเซลล์ขนาดปกติแต่ติดสีซีด (Normocytic Hypochromic Anemia) เนื่องจากตรวจพบระดับฮีโมโกลบิน (Hb) ${hemoglobin} g/dL และจำนวนเม็ดเลือดแดง (RBC) ${redBloodCellCount} M/uL ต่ำกว่าเกณฑ์ปกติ ร่วมกับค่าดัชนีเม็ดเลือดแดง MCH ${readCbcValue("cbc-mch")} pg และ MCHC ${readCbcValue("cbc-mchc")} g/dL ลดลงต่ำกว่าปกติ ขณะที่ปริมาตรเฉลี่ยของเม็ดเลือดแดง (MCV) ${mcvValue} fL ยังอยู่ในเกณฑ์ปกติ (80–100 fL)`
+          ),
+          createElement(
+            "p",
+            "",
+            `ลักษณะดังกล่าวบ่งชี้ว่าขนาดเม็ดเลือดแดงยังคงเป็นปกติ (Normocytic) แต่ปริมาณและความเข้มข้นของฮีโมโกลบินภายในเซลล์ลดลง ทำให้เม็ดเลือดแดงติดสีซีด (Hypochromic) ซึ่งอาจเป็นสัญญาณของภาวะขาดธาตุเหล็กในระยะเริ่มต้น (Early Iron Deficiency Anemia) หรือภาวะโลหิตจางจากโรคอักเสบเรื้อรัง (Anemia of Chronic Disease/Inflammation) ที่ส่งผลต่อการสังเคราะห์ฮีโมโกลบิน ทั้งนี้ค่า RBC ${redBloodCellCount} M/uL อยู่ในเกณฑ์ต่ำหรือปกติตามเกณฑ์สำหรับ${isMale ? "เพศชาย (4.7–6.1 M/uL)" : isPregnant ? "หญิงตั้งครรภ์ (3.5–4.8 M/uL)" : "เพศหญิง (4.2–5.4 M/uL)"}`
+          ),
+          createElement(
+            "p",
+            "",
+            "แนะนำให้แพทย์ส่งตรวจเพิ่มเติมเพื่อยืนยัน:"
+          ),
+          createElement(
+            "p",
+            "",
+            "1. สเมียร์เลือด (Peripheral Blood Smear; PBS) และ Reticulocyte Count เป็นอันดับแรก เพื่อยืนยันลักษณะเม็ดเลือดแดงและประเมินเม็ดเลือดแดงตัวอ่อน รวมถึงการตอบสนองของไขกระดูกต่อการสูญเสียเลือด"
+          ),
+          ...(giBleedingHistory
+            ? [createElement(
+                "p",
+                "",
+                "2. จากประวัติอุจจาระสีดำ อุจจาระเป็นเลือด การใช้ยา NSAIDs หรือน้ำหนักลดฮวบที่เลือกไว้ ควรแจ้งแพทย์และพิจารณาตรวจเลือดแฝงในอุจจาระ (FOBT) หรือส่องกล้องทางเดินอาหาร (Endoscopy) โดยเร็ว เพื่อค้นหาสาเหตุเลือดออกในทางเดินอาหาร"
+              )]
+            : []),
+          createElement(
+            "p",
+            "",
+            "3. ตรวจระดับธาตุเหล็กในเลือด (Iron Panel: Serum Iron, TIBC และ Serum Ferritin) เพื่อยืนยันภาวะขาดธาตุเหล็กและช่วยแยกจากภาวะโลหิตจางจากโรคเรื้อรัง"
+          ),
+          ...(relevantFamilyHistory || chronicInflammationHistory
+            ? [createElement(
+                "p",
+                "",
+                `4. จากประวัติ${relevantFamilyHistory ? "ครอบครัวที่เกี่ยวข้องกับโลหิตจาง/ธาลัสซีเมีย/G6PD" : ""}${relevantFamilyHistory && chronicInflammationHistory ? " และ " : ""}${chronicInflammationHistory ? "วัณโรค (TB)" : ""} แพทย์อาจพิจารณาตรวจชนิดฮีโมโกลบิน (Hemoglobin Typing) และดัชนีการอักเสบ (ESR, CRP) เพื่อประเมินโรคแฝงทางพันธุกรรมและภาวะอักเสบเรื้อรัง`
+              )]
+            : []),
+          createElement(
+            "p",
+            "",
+            "การแปลผลนี้ใช้ Hb, MCV, MCH, MCHC และ RBC เป็นเกณฑ์จำแนกรูปแบบ ส่วนค่า CBC อื่นไม่ใช้จำแนกภาวะนี้ และผลคัดกรองไม่ใช่การวินิจฉัยยืนยัน"
+          )
+        );
+      } else if (idaPattern) {
+        summarySection.append(
+          createElement(
+            "p",
+            "",
+            "ผลเลือดเข้าข่ายภาวะโลหิตจางจากการขาดธาตุเหล็ก (Iron Deficiency Anemia: IDA) เนื่องจากพบภาวะโลหิตจางร่วมกับเม็ดเลือดแดงมีขนาดเล็กและสีซีดกว่าปกติ ทั้งนี้อาจพบภาวะเกล็ดเลือดสูงร่วมด้วยเนื่องจากเป็นปฏิกิริยาตอบสนองของร่างกาย"
+          ),
+          createElement(
+            "p",
+            "",
+            "แนะนำให้แพทย์ส่งตรวจเพิ่มเติมเพื่อยืนยัน โดยพิจารณาตรวจ Serum Ferritin เป็นลำดับแรก (ค่า ≤30 ng/mL บ่งชี้ภาวะขาดธาตุเหล็ก) หรือพิจารณาตรวจ Iron profile ร่วมกับ Transferrin Saturation (TSAT <20%) ในกรณีมีภาวะอักเสบร่วมด้วย"
+          )
+        );
+      } else if (anemia) {
+        const missingCriteria = Object.entries(idaMarkers)
+          .filter(([, present]) => !present)
+          .map(([marker]) => ({
+            lowHgb: "Hb ต่ำ",
+            lowHct: "Hct ต่ำ",
+            lowMcv: "MCV <80 fL",
+            lowMch: "MCH <27 pg",
+            lowMchc: "MCHC <31 g/dL",
+            rbcLowOrNormal: "RBC ต่ำหรือปกติ",
+            highPlatelets: "PLT >400 K/uL",
+            highPdw: "PDW >17.0%",
+            highPct: "PCT >0.25 K/uL"
+          }[marker]));
+        summarySection.append(
+          createElement(
+            "p",
+            "",
+            `พบภาวะโลหิตจางจาก Hb ต่ำกว่าเกณฑ์ที่กำหนด (${hemoglobinRange.min} g/dL) แต่ผล CBC ยังไม่ครบรูปแบบคัดกรอง IDA`
+          ),
+          createElement("p", "", `เงื่อนไข IDA ที่ยังไม่ครบ: ${missingCriteria.join(", ")}`),
+          createElement("p", "", "ควรให้แพทย์ประเมินร่วมกับอาการ ประวัติ และผลตรวจเพิ่มเติม")
+        );
+      } else if (healthyCbcPattern) {
+        summarySection.append(
+          createElement(
+            "p",
+            "",
+            "ผลเลือดเข้าข่ายปกติ ไม่พบภาวะโลหิตจาง (Anemia) หรือรูปแบบ CBC ที่เข้าได้กับภาวะโลหิตจางจากการขาดธาตุเหล็ก (Iron Deficiency Anemia: IDA) หรือความผิดปกติอื่นในค่าที่ตรวจ เนื่องจากค่าฮีโมโกลบิน (Hemoglobin) และฮีมาโตคริต (Hematocrit) รวมถึงขนาดและสีของเม็ดเลือดแดง (MCV, MCH, MCHC) และค่า CBC อื่นที่ประเมิน อยู่ในเกณฑ์ปกติทั้งหมด"
+          ),
+          createElement(
+            "p",
+            "",
+            "ผล CBC ปกติไม่สามารถตัดภาวะขาดธาตุเหล็กระยะเริ่มต้นหรือโรคอื่นได้ทั้งหมด หากยังมีอาการหรือข้อสงสัย ควรปรึกษาแพทย์และพิจารณาตรวจเพิ่มเติมตามความเหมาะสม"
+          )
+        );
+      } else {
+        summarySection.append(
+          createElement(
+            "p",
+            "",
+            enteredValuesAllNormal
+              ? "ค่าที่กรอกอยู่ในช่วงอ้างอิง แต่ข้อมูล CBC ยังไม่ครบ จึงสรุปไม่ได้ว่าไม่พบภาวะโลหิตจางหรือความผิดปกติอื่น"
+              : Number.isFinite(hemoglobin) && hemoglobinRange
+                ? `ค่า Hb ไม่ต่ำกว่าเกณฑ์ภาวะโลหิตจางที่กำหนด (${hemoglobinRange.min} g/dL) แต่พบค่า CBC บางรายการนอกช่วงอ้างอิง โปรดพิจารณาผลแต่ละรายการร่วมกับช่วงอ้างอิงของห้องปฏิบัติการ`
+                : "พบค่า CBC บางรายการนอกช่วงอ้างอิง โปรดพิจารณาเฉพาะค่าที่กรอกและช่วงอ้างอิงของห้องปฏิบัติการ เนื่องจากข้อมูลที่เหลือไม่ได้กรอก"
+          ),
+          createElement("p", "", "ผล CBC เพียงอย่างเดียวไม่ยืนยันหรือคัดออกภาวะขาดธาตุเหล็ก")
+        );
+      }
+      if (!thrombocytopeniaPattern) {
+        const plateletCountNormal = plateletCount >= 150 && plateletCount <= 400;
+        const plateletSizeInterpretation = plateletDistributionWidth > 17.0 &&
+          meanPlateletVolume > 11.0
+          ? "PDW สูงร่วมกับ MPV สูง อาจบ่งชี้ว่ามีเกล็ดเลือดตัวอ่อนขนาดใหญ่จำนวนมาก"
+          : plateletDistributionWidth > 17.0 && plateletCountNormal
+            ? "PDW สูงแต่จำนวนเกล็ดเลือดปกติ อาจสัมพันธ์กับการอักเสบเล็กน้อย"
+            : plateletDistributionWidth > 17.0
+              ? "PDW สูง แสดงความแปรปรวนของขนาดเกล็ดเลือด"
+              : "";
+        if (plateletSizeInterpretation) {
+          summarySection.append(createElement("p", "", plateletSizeInterpretation));
+        }
+      }
+      reportContent.append(summarySection);
+      reportContent.append(createElement(
+        "div",
+        "report-note",
+        "ผลนี้เป็นการคัดกรองเบื้องต้น ไม่ใช้แทนการวินิจฉัยของแพทย์ และไม่มีการสรุปหรือแนะนำการใช้ยา"
+      ));
+    });
+
+    form.addEventListener("input", () => {
+      confirmation.classList.remove("visible", "normal", "notice", "report-shell");
+    });
+  </script>
+</body>
+</html>
